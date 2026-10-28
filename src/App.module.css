@@ -1,0 +1,117 @@
+.game {
+  max-width: 980px;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 320px);
+  gap: 18px;
+  align-items: start;
+  justify-content: center;
+}
+
+.boardWrap {
+  /* The board sizes its holes to this container's width (cqi), so it fits the portal and phones alike. */
+  container-type: inline-size;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  min-width: 0;
+}
+
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.buttons > * {
+  flex: 1;
+}
+
+.reset {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.save {
+  margin-top: 10px;
+  min-height: 16px;
+}
+
+.settings {
+  display: grid;
+  gap: 12px;
+}
+
+.settings :global(.arc-field) {
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.series {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 0;
+}
+
+.series > div {
+  padding: 8px 10px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-md);
+  background: var(--panel-bg-soft);
+}
+
+.series dt {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+}
+
+.series dd {
+  margin: 2px 0 0;
+  font-size: 22px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-strong);
+}
+
+.dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+/* Disc identity colours (same as the board's). */
+.red {
+  background: #e5383b;
+}
+
+.yellow {
+  background: #f5c518;
+}
+
+.note {
+  margin: 10px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--text-mute);
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
