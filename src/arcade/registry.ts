@@ -96,6 +96,14 @@ export const ARCADE_GAMES: readonly ArcadeGameInfo[] = [
     tagline: 'Drop discs, line up four. A 7×6 classic against an α-β minimax AI — or a friend.',
     colorVar: '--game-connect4',
   },
+  {
+    id: 'nutsort',
+    name: 'Nut Sort',
+    repo: 'https://github.com/ZoliQua/Nut-Sort-Game',
+    tag: 'Sorting',
+    tagline: 'Sort the nuts onto bolts in as few moves as you can — shaped for colour-blind players.',
+    colorVar: '--game-nutsort',
+  },
 ];
 
 export function gameInfo(id: ArcadeGameId): ArcadeGameInfo {
