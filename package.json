@@ -1,7 +1,7 @@
 {
   "name": "connect-four-game",
   "private": true,
-  "version": "1.0.1",
+  "version": "1.0.2",
   "type": "module",
   "description": "Type-safe Connect Four in React + Vite + TypeScript — 7×6 board with drop animation, PvP and three AI levels (bitboard negamax with α-β pruning, transposition table and iterative deepening), autosave & resume, shared Zoltan’s Arcade stats. Part of Arcade-Game-Center.",
   "license": "MIT",

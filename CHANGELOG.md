@@ -6,6 +6,13 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [1.0.2] — 2026-12-06
+
+### Changed
+
+- Vendored kit (`src/arcade/`) updated: the registry knows the eleventh arcade game, Texas Hold'em, with its accent colour.
+- README: the Zoltan's Arcade family table lists all eleven games.
+
 ## [1.0.1] — 2026-11-22
 
 ### Changed
