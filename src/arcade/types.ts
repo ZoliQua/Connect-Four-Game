@@ -7,7 +7,7 @@
  */
 
 export type ArcadeGameId = 'tetris' | 'snake' | '2048' | 'pacman' | 'gomoku' | 'tictactoe'
-  | 'breakout' | 'invaders' | 'connect4' | 'nutsort';
+  | 'breakout' | 'invaders' | 'connect4' | 'nutsort' | 'holdem';
 
 /** Lifecycle every game maps its own state machine onto. */
 export type ArcadeStatus = 'idle' | 'running' | 'paused' | 'gameOver';

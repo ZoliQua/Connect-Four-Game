@@ -42,6 +42,7 @@
   --game-invaders: #b37dff;
   --game-connect4: #ff5c8a;
   --game-nutsort: #9fd356;
+  --game-holdem: #38bdf8;
 
   /* Tetromino palette (matches Tetris logic/constants.ts) */
   --tetro-I: #31c7ef;
@@ -91,6 +92,7 @@
   --game-invaders: #8a4fd8;
   --game-connect4: #d6336c;
   --game-nutsort: #5f9e2f;
+  --game-holdem: #0284c7;
   --shadow-sm: 0 2px 8px rgba(15, 16, 22, 0.06);
   --shadow-md: 0 8px 24px rgba(15, 16, 22, 0.1);
   --shadow-lg: 0 18px 48px rgba(15, 16, 22, 0.14);

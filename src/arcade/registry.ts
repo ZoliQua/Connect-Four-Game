@@ -104,6 +104,14 @@ export const ARCADE_GAMES: readonly ArcadeGameInfo[] = [
     tagline: 'Sort the nuts onto bolts in as few moves as you can — shaped for colour-blind players.',
     colorVar: '--game-nutsort',
   },
+  {
+    id: 'holdem',
+    name: "Texas Hold'em",
+    repo: 'https://github.com/ZoliQua/Texas-Holdem-Game',
+    tag: 'Cards',
+    tagline: "No-limit hold'em tournaments against bots with their own faces, styles and tells.",
+    colorVar: '--game-holdem',
+  },
 ];
 
 export function gameInfo(id: ArcadeGameId): ArcadeGameInfo {
