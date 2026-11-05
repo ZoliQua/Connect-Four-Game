@@ -2,6 +2,20 @@ import { useCallback, useEffect, useRef, useState, type RefCallback } from 'reac
 import { loadSession, clearSession, saveSession, type SessionEnvelope } from './session';
 import { readStats, recordRun, subscribeStats, type GameStats } from './stats';
 import { applyTheme, readTheme, THEME_EVENT, type ArcadeTheme } from './theme';
+import {
+  applyLang,
+  isLang,
+  KIT_MESSAGES,
+  LANG_EVENT,
+  LANG_KEY,
+  readLang,
+  translate,
+  type KitMessageKey,
+  type Lang,
+  type Messages,
+  type MessageVars,
+} from './i18n';
+import { applyDental, DENTAL_EVENT, DENTAL_KEY, markDental, readDental } from './dental';
 import type {
   ArcadeGameId,
   ArcadeGameProps,
@@ -240,6 +254,81 @@ export function useArcadeTheme(): [ArcadeTheme, (t: ArcadeTheme) => void, () => 
     });
   }, []);
   return [theme, setTheme, toggle];
+}
+
+/** Shared language (`arcade.lang`), synced across the portal, games and tabs. */
+export function useLang(): [Lang, (l: Lang) => void] {
+  const [lang, setLangState] = useState<Lang>(readLang);
+  useEffect(() => {
+    document.documentElement.lang = lang;
+  }, [lang]);
+  useEffect(() => {
+    setLangState(readLang());
+    // In-page events carry the value (works even when storage is blocked); other tabs re-read storage.
+    const onLang = (e: Event) => {
+      const l = (e as CustomEvent<unknown>).detail;
+      if (isLang(l)) setLangState(l);
+    };
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === null || e.key === LANG_KEY) setLangState(readLang());
+    };
+    window.addEventListener(LANG_EVENT, onLang);
+    window.addEventListener('storage', onStorage);
+    return () => {
+      window.removeEventListener(LANG_EVENT, onLang);
+      window.removeEventListener('storage', onStorage);
+    };
+  }, []);
+  const setLang = useCallback((l: Lang) => {
+    setLangState(l);
+    applyLang(l);
+  }, []);
+  return [lang, setLang];
+}
+
+/** Shared dental mode (`arcade.dental`, default off), synced across the portal, games and tabs. */
+export function useDental(): [boolean, (on: boolean) => void] {
+  const [dental, setDentalState] = useState<boolean>(readDental);
+  useEffect(() => {
+    markDental(dental);
+  }, [dental]);
+  useEffect(() => {
+    setDentalState(readDental());
+    const onDental = (e: Event) => {
+      const on = (e as CustomEvent<unknown>).detail;
+      if (typeof on === 'boolean') setDentalState(on);
+    };
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === null || e.key === DENTAL_KEY) setDentalState(readDental());
+    };
+    window.addEventListener(DENTAL_EVENT, onDental);
+    window.addEventListener('storage', onStorage);
+    return () => {
+      window.removeEventListener(DENTAL_EVENT, onDental);
+      window.removeEventListener('storage', onStorage);
+    };
+  }, []);
+  const setDental = useCallback((on: boolean) => {
+    setDentalState(on);
+    applyDental(on);
+  }, []);
+  return [dental, setDental];
+}
+
+/**
+ * Translator for a typed dictionary in the active language:
+ * `t('greet', { name: 'Zoli' })` fills `{name}`; missing keys fall back to English.
+ */
+export function useMessages<K extends string>(
+  dict: Messages<K>,
+): (key: K, vars?: Record<string, string | number>) => string {
+  const [lang] = useLang();
+  return useCallback((key: K, vars?: MessageVars) => translate(dict, lang, key, vars), [dict, lang]);
+}
+
+/** Translator for the kit's shared strings (Score, Best, Resume, Paused, …). */
+export function useKitMessages(): (key: KitMessageKey, vars?: Record<string, string | number>) => string {
+  return useMessages(KIT_MESSAGES);
 }
 
 /** True while the element is on screen; drives demo animations. */

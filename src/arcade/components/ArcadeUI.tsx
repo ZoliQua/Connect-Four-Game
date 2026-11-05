@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react';
 import { formatSavedAt } from '../format';
+import { useKitMessages, useLang } from '../hooks';
+import type { KitMessageKey } from '../i18n';
 import type { ArcadeStatus } from '../types';
 
 export type StatItem = {
@@ -9,18 +11,20 @@ export type StatItem = {
   highlight?: boolean;
 };
 
-const STATUS_LABEL: Record<ArcadeStatus, string> = {
-  idle: 'Ready',
-  running: 'Playing',
-  paused: 'Paused',
-  gameOver: 'Game over',
+const STATUS_KEY: Record<ArcadeStatus, KitMessageKey> = {
+  idle: 'statusIdle',
+  running: 'statusRunning',
+  paused: 'statusPaused',
+  gameOver: 'statusGameOver',
 };
 
+/** Status chip; the default label follows the shared language, a passed `label` wins. */
 export function StatusPill({ status, label }: { status: ArcadeStatus; label?: string }) {
+  const t = useKitMessages();
   return (
     <span className={`arc-status arc-status--${status}`} role="status">
       <span className="arc-status__dot" aria-hidden="true" />
-      {label ?? STATUS_LABEL[status]}
+      {label ?? t(STATUS_KEY[status])}
     </span>
   );
 }
@@ -98,24 +102,30 @@ export function GameOverlay({
 
 /** Small "Autosaved · just now" chip with an optional discard action. */
 export function SaveBadge({ savedAt, onDiscard }: { savedAt: number | null; onDiscard?: () => void }) {
+  const t = useKitMessages();
+  const [lang] = useLang();
   if (savedAt === null) return null;
   return (
     <span className="arc-save" title={new Date(savedAt).toLocaleString()}>
       <span className="arc-save__dot" aria-hidden="true" />
-      Autosaved · {formatSavedAt(savedAt)}
+      {t('autosaved')} · {formatSavedAt(savedAt, Date.now(), lang)}
       {onDiscard && (
         <button type="button" className="arc-save__discard" onClick={onDiscard}>
-          Discard
+          {t('discard')}
         </button>
       )}
     </span>
   );
 }
 
-/** Uniform keyboard help list. */
-export function KeyHelp({ rows }: { rows: [keys: string, action: string][] }) {
-  return (
-    <ul className="arc-keys">
+/**
+ * Uniform keyboard help list. `heading`: `true` shows the translated
+ * "Controls" title, a node shows that instead; omitted, no title (as before).
+ */
+export function KeyHelp({ rows, heading }: { rows: [keys: string, action: string][]; heading?: ReactNode | boolean }) {
+  const t = useKitMessages();
+  const list = (
+    <ul className="arc-keys" aria-label={heading ? undefined : t('controls')}>
       {rows.map(([keys, action]) => (
         <li key={keys}>
           <span>
@@ -129,5 +139,12 @@ export function KeyHelp({ rows }: { rows: [keys: string, action: string][] }) {
         </li>
       ))}
     </ul>
+  );
+  if (!heading) return list;
+  return (
+    <section className="arc-keys-wrap" aria-label={typeof heading === 'string' ? heading : t('controls')}>
+      <h3 className="arc-keys__heading">{heading === true ? t('controls') : heading}</h3>
+      {list}
+    </section>
   );
 }

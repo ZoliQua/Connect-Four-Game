@@ -569,6 +569,109 @@ body {
   border-radius: 3px;
   background: var(--game-color);
 }
+/* Language menu (globe + code) and dental-mode toggle in the top bar. */
+.arc-lang {
+  position: relative;
+}
+.arc-lang__btn,
+.arc-dental-toggle {
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--panel-border);
+  background: var(--panel-bg);
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.arc-lang__btn:hover,
+.arc-dental-toggle:hover {
+  border-color: var(--game-color, var(--accent));
+}
+.arc-lang__btn:focus-visible,
+.arc-dental-toggle:focus-visible,
+.arc-lang__list button:focus-visible {
+  outline: 2px solid var(--accent-ring);
+  outline-offset: 2px;
+}
+.arc-lang__code {
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+}
+.arc-lang__list {
+  min-width: 170px;
+  z-index: 30;
+}
+.arc-lang__list button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+.arc-lang__list button:hover {
+  background: var(--panel-bg-soft);
+}
+.arc-lang__list button[aria-checked='true'] {
+  font-weight: 700;
+}
+.arc-lang__list small {
+  margin-left: auto;
+  color: var(--text-mute);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+.arc-lang__mark {
+  width: 12px;
+  text-align: center;
+}
+.arc-dental-toggle__icon {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  /* Off: hollow outline tooth. On: filled tooth + check badge (shape, not just colour). */
+  --arc-tooth-fill: transparent;
+  --arc-tooth-stroke: currentColor;
+  --arc-tooth-shine: transparent;
+}
+.arc-dental-toggle--on {
+  border-color: var(--game-color, var(--accent));
+  background: color-mix(in oklab, var(--game-color, var(--accent)) 16%, var(--panel-bg));
+}
+.arc-dental-toggle--on .arc-dental-toggle__icon {
+  --arc-tooth-fill: #f7f8fb;
+  --arc-tooth-stroke: #6b7080;
+  --arc-tooth-shine: #fff;
+}
+.arc-dental-toggle__check {
+  position: absolute;
+  right: -5px;
+  bottom: -3px;
+  padding: 1px;
+  border-radius: 50%;
+  background: var(--game-color, var(--accent));
+  color: #0f1016;
+}
+.arc-keys__heading {
+  margin: 0 0 8px;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+}
 .arc-page__main {
   flex: 1;
   padding: 24px 20px 32px;
@@ -590,7 +693,8 @@ body {
   .arc-topbar {
     padding: 8px 12px;
   }
-  .arc-topbar__nav > a.arc-btn {
+  .arc-topbar__nav > a.arc-btn,
+  .arc-dental-toggle__label {
     display: none;
   }
   .arc-page__main {
