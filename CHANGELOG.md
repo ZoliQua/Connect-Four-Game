@@ -6,21 +6,21 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
-## [1.0.2] — 2026-12-06
+## [1.0.2] — 2026-11-04
 
 ### Changed
 
 - Vendored kit (`src/arcade/`) updated: the registry knows the eleventh arcade game, Texas Hold'em, with its accent colour.
 - README: the Zoltan's Arcade family table lists all eleven games.
 
-## [1.0.1] — 2026-11-22
+## [1.0.1] — 2026-11-01
 
 ### Changed
 
 - Vendored kit (`src/arcade/`) updated: the registry knows the tenth arcade game, Nut Sort, with its accent colour.
 - README: the Zoltan's Arcade family table lists all ten games.
 
-## [1.0.0] - 2026-11-11
+## [1.0.0] - 2026-10-28
 
 ### Added
 - Connect Four on the classic 7 × 6 rack: discs fall to the lowest empty cell with a CSS-transform drop animation (skipped under
