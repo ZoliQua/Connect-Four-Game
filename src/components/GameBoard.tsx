@@ -1,4 +1,6 @@
 import { memo, useEffect, useRef, type CSSProperties } from 'react';
+import { useMessages } from '../arcade';
+import { MESSAGES, type MessageKey } from '../i18n';
 import { cellIndex, columnHeight } from '../logic/board';
 import { COLS, ROWS } from '../logic/constants';
 import type { Board, Player } from '../logic/types';
@@ -24,18 +26,20 @@ export type GameBoardProps = {
 };
 
 const noop = () => {};
-const DEFAULT_NAMES: Record<Player, string> = { 1: 'red', 2: 'yellow' };
+const DEFAULT_NAMES: Record<Player, MessageKey> = { 1: 'discRed', 2: 'discYellow' };
 const discClass = (p: Player) => (p === 1 ? styles.p1 : styles.p2);
 
-function columnLabel(board: Board, col: number, names: Record<Player, string>): string {
+type T = (key: MessageKey, vars?: Record<string, string | number>) => string;
+
+function columnLabel(board: Board, col: number, names: Record<Player, string>, t: T): string {
   const discs: string[] = [];
   for (let row = ROWS - 1; row >= 0; row -= 1) {
     const c = board[cellIndex(row, col)];
     if (c !== 0) discs.push(names[c]);
   }
-  if (discs.length === ROWS) return `Column ${col + 1}, full: ${discs.join(', ')} (bottom up)`;
-  if (discs.length === 0) return `Column ${col + 1}, empty`;
-  return `Column ${col + 1}, ${discs.length} of ${ROWS}: ${discs.join(', ')} (bottom up)`;
+  if (discs.length === ROWS) return t('colFull', { n: col + 1, discs: discs.join(', ') });
+  if (discs.length === 0) return t('colEmpty', { n: col + 1 });
+  return t('colPartial', { n: col + 1, count: discs.length, rows: ROWS, discs: discs.join(', ') });
 }
 
 /**
@@ -53,9 +57,11 @@ export const GameBoard = memo(function GameBoard({
   interactive = false,
   onDrop = noop,
   onFocusCol = noop,
-  names = DEFAULT_NAMES,
+  names: namesProp,
   variant = 'full',
 }: GameBoardProps) {
+  const t = useMessages(MESSAGES);
+  const names = namesProp ?? { 1: t(DEFAULT_NAMES[1]), 2: t(DEFAULT_NAMES[2]) };
   const mini = variant === 'mini';
   const rootRef = useRef<HTMLDivElement>(null);
   const won = winningCells !== null && winningCells.length > 0;
@@ -117,7 +123,7 @@ export const GameBoard = memo(function GameBoard({
         className={[styles.column, focused ? styles.focused : '', playable ? styles.playable : '']
           .filter(Boolean)
           .join(' ')}
-        aria-label={columnLabel(board, col, names)}
+        aria-label={columnLabel(board, col, names, t)}
         aria-disabled={!playable}
         tabIndex={focused || (focusCol < 0 && col === 3) ? 0 : -1}
         onClick={() => {
@@ -141,7 +147,7 @@ export const GameBoard = memo(function GameBoard({
       ref={rootRef}
       className={[styles.board, mini ? styles.mini : '', won ? styles.over : ''].filter(Boolean).join(' ')}
       role={mini ? undefined : 'group'}
-      aria-label={mini ? undefined : 'Connect Four board'}
+      aria-label={mini ? undefined : t('boardLabel')}
       aria-hidden={mini ? true : undefined}
     >
       <span className={styles.frame} aria-hidden="true" />

@@ -5,13 +5,6 @@ import type { GameAction, GameState, Mode, Player } from './types';
 
 export const MODES: readonly Mode[] = ['pvp', 'easy', 'medium', 'hard'] as const;
 
-export const MODE_LABEL: Record<Mode, string> = {
-  pvp: 'PvP',
-  easy: 'Easy',
-  medium: 'Medium',
-  hard: 'Hard',
-};
-
 /** The AI's side, or null in local two-player mode. */
 export const aiPlayerFor = (state: Pick<GameState, 'mode' | 'humanPlayer'>): Player | null =>
   state.mode === 'pvp' ? null : other(state.humanPlayer);

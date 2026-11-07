@@ -6,6 +6,10 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- Hungarian and German: every game string follows the shared arcade language (`src/i18n.ts`); the game is called „Négy a sorban” / „Vier gewinnt”.
+
 ## [1.0.2] — 2026-11-04
 
 ### Changed

@@ -3,6 +3,8 @@ import {
   clearSession,
   DUEL_BASE_POINTS,
   formatClock,
+  formatNumber,
+  gameName,
   GameOverlay,
   KeyHelp,
   SaveBadge,
@@ -10,6 +12,9 @@ import {
   useArcadeRun,
   useRestoredSession,
   useRunTimer,
+  useKitMessages,
+  useLang,
+  useMessages,
   useSessionAutosave,
   type ArcadeGameProps,
   type ArcadeStatus,
@@ -23,9 +28,10 @@ import { useAITurn } from './hooks/useAITurn';
 import { useConnectFourKeys } from './hooks/useConnectFourKeys';
 import { replayMoves } from './logic/board';
 import { COLS } from './logic/constants';
-import { advanceGame, aiPlayerFor, createInitialState, isHumanTurn, MODE_LABEL, MODES, roundOutcome } from './logic/game';
+import { advanceGame, aiPlayerFor, createInitialState, isHumanTurn, MODES, roundOutcome } from './logic/game';
 import { isConnectFourSession, type SavedGame } from './logic/persist';
 import type { GameState, Mode, Player } from './logic/types';
+import { MESSAGES, type MessageKey } from './i18n';
 import styles from './App.module.css';
 
 /** Bump when SavedGame changes shape; older saves are then discarded. */
@@ -41,22 +47,29 @@ export const RESULT_DELAY_MS = 1100;
  */
 type Phase = 'idle' | 'live' | 'paused';
 
-const KEYS: [string, string][] = [
-  ['← →', 'Choose column (or A D)'],
-  ['1–7', 'Jump to column'],
-  ['Enter Space ↓', 'Drop · start · next round'],
-  ['P Esc', 'Pause / resume'],
-  ['R', 'New round'],
-  ['N', 'Cycle mode'],
-  ['C', 'Reset series scores'],
+const KEYS: [string, MessageKey][] = [
+  ['← →', 'keyColumn'],
+  ['1–7', 'keyJump'],
+  ['Enter Space ↓', 'keyDrop'],
+  ['P Esc', 'keyPause'],
+  ['R', 'keyNewRound'],
+  ['N', 'keyCycleMode'],
+  ['C', 'keyResetScores'],
 ];
 
-const COLOR_NAME: Record<Player, string> = { 1: 'Red', 2: 'Yellow' };
+const COLOR_NAME: Record<Player, MessageKey> = { 1: 'red', 2: 'yellow' };
+
+const MODE_KEY: Record<Mode, MessageKey> = {
+  pvp: 'modePvp',
+  easy: 'modeEasy',
+  medium: 'modeMedium',
+  hard: 'modeHard',
+};
 
 /** Disc owners as read out in the column labels. */
-const discNames = (ai: Player | null): Record<Player, string> => {
-  if (ai === null) return { 1: 'red', 2: 'yellow' };
-  return ai === 2 ? { 1: 'yours (red)', 2: 'AI (yellow)' } : { 1: 'AI (red)', 2: 'yours (yellow)' };
+const discNames = (ai: Player | null): Record<Player, MessageKey> => {
+  if (ai === null) return { 1: 'discRed', 2: 'discYellow' };
+  return ai === 2 ? { 1: 'discYoursRed', 2: 'discAiYellow' } : { 1: 'discAiRed', 2: 'discYoursYellow' };
 };
 
 /** Cell of the newest disc (it plays the drop animation), or -1. */
@@ -65,6 +78,9 @@ const lastIndexOf = (moves: readonly number[], startingPlayer: Player): number =
 
 export function ConnectFourGame(props: ArcadeGameProps = {}) {
   const { embedded = false } = props;
+  const t = useMessages(MESSAGES);
+  const k = useKitMessages();
+  const [lang] = useLang();
   const restored = useRestoredSession<SavedGame>('connect4', SESSION_SCHEMA, isConnectFourSession);
   // A restored round that was still being played resumes exactly; a finished
   // one is not replayed (it is already recorded) — the series goes on with a new round.
@@ -239,67 +255,71 @@ export function ConnectFourGame(props: ArcadeGameProps = {}) {
   const newBest = ranked && state.roundScore > 0 && state.roundScore > stats.bestBeforeRun;
   const humanWins = state.humanPlayer === 1 ? state.scores.p1 : state.scores.p2;
   const aiWins = state.humanPlayer === 1 ? state.scores.p2 : state.scores.p1;
-  const names = useMemo(() => discNames(ai), [ai]);
+  const names = useMemo(() => {
+    const keys = discNames(ai);
+    return { 1: t(keys[1]), 2: t(keys[2]) } as Record<Player, string>;
+  }, [ai, t]);
+  const keyRows = useMemo(() => KEYS.map(([keys, action]): [string, string] => [keys, t(action)]), [t]);
+  const num = (n: number) => formatNumber(n, lang);
+  const record = `${num(humanWins)}–${num(aiWins)}–${num(state.scores.draws)}`;
   const lastIndex = useMemo(() => lastIndexOf(state.moves, state.startingPlayer), [state.moves, state.startingPlayer]);
   const roundNumber = state.scores.p1 + state.scores.p2 + state.scores.draws + (roundOver ? 0 : 1);
 
   let turnLabel: string | undefined;
   if (status === 'running') {
-    if (ai === null) turnLabel = `${COLOR_NAME[state.current]} to move`;
-    else turnLabel = state.current === ai ? 'AI thinking…' : 'Your turn';
+    if (ai === null) turnLabel = t('toMove', { color: t(COLOR_NAME[state.current]) });
+    else turnLabel = state.current === ai ? t('aiThinking') : t('yourTurn');
   }
 
   let overlay: { title: string; message: string; actions: OverlayAction[] } | null = null;
   if (confirmOpen) {
     overlay = {
-      title: 'Reset series scores?',
-      message: 'This clears wins, losses, draws and series points. Your arcade Best and stats stay.',
+      title: t('resetTitle'),
+      message: t('resetBody'),
       actions: [
-        { label: 'Reset scores', onClick: confirmReset, primary: true, kbd: 'Enter' },
-        { label: 'Keep', onClick: cancelReset, kbd: 'Esc' },
+        { label: t('resetConfirm'), onClick: confirmReset, primary: true, kbd: 'Enter' },
+        { label: t('keep'), onClick: cancelReset, kbd: 'Esc' },
       ],
     };
   } else if (status === 'idle') {
     overlay = {
-      title: 'Connect Four',
-      message:
-        state.mode === 'pvp'
-          ? 'Two players, one rack: line up four discs. PvP rounds are just for fun (unranked).'
-          : 'Line up four discs before the AI does. Faster wins and harder AIs score more points.',
-      actions: [{ label: 'Start', onClick: start, primary: true, kbd: 'Space' }],
+      title: gameName('connect4', lang),
+      message: state.mode === 'pvp' ? t('idlePvp') : t('idleAi'),
+      actions: [{ label: k('start'), onClick: start, primary: true, kbd: 'Space' }],
     };
   } else if (status === 'paused') {
     overlay = welcomeBack
       ? {
-          title: 'Welcome back',
-          message: `Your ${MODE_LABEL[state.mode]} series was restored — ${state.points} points, ${humanWins}–${aiWins}–${state.scores.draws}.`,
+          title: k('welcomeBack'),
+          message: t('welcomeBody', { mode: t(MODE_KEY[state.mode]), points: num(state.points), record }),
           actions: [
-            { label: 'Continue', onClick: togglePause, primary: true, kbd: 'P' },
-            { label: 'New round', onClick: newRound, kbd: 'R' },
-            { label: 'New series', onClick: newSeries },
+            { label: t('continue'), onClick: togglePause, primary: true, kbd: 'P' },
+            { label: t('newRound'), onClick: newRound, kbd: 'R' },
+            { label: t('newSeries'), onClick: newSeries },
           ],
         }
       : {
-          title: 'Paused',
-          message: 'Your series is autosaved — you can close the tab and continue later.',
+          title: k('paused'),
+          message: t('pausedBody'),
           actions: [
-            { label: 'Resume', onClick: togglePause, primary: true, kbd: 'P' },
-            { label: 'New round', onClick: newRound, kbd: 'R' },
+            { label: k('resume'), onClick: togglePause, primary: true, kbd: 'P' },
+            { label: t('newRound'), onClick: newRound, kbd: 'R' },
           ],
         };
   } else if (status === 'gameOver' && showResult) {
     const outcome = roundOutcome(state);
     let title: string;
-    if (outcome === 'draw') title = "It's a draw";
-    else if (ai === null) title = `${COLOR_NAME[state.winner as Player]} wins!`;
-    else title = outcome === 'win' ? 'You win!' : 'The AI wins';
+    if (outcome === 'draw') title = t('draw');
+    else if (ai === null) title = t('colorWins', { color: t(COLOR_NAME[state.winner as Player]) });
+    else title = outcome === 'win' ? t('youWin') : t('aiWins');
     const message = ranked
-      ? `+${state.roundScore} points in ${state.moves.length} discs · Series ${state.points} · Best ${best}${newBest ? ' — new best!' : ''}`
-      : 'PvP rounds are unranked. Loser opens the next round.';
+      ? t('resultRanked', { score: num(state.roundScore), discs: state.moves.length, points: num(state.points), best: num(best) }) +
+        (newBest ? t('resultNewBest') : '')
+      : t('resultPvp');
     overlay = {
       title,
       message,
-      actions: [{ label: 'Next round', onClick: newRound, primary: true, kbd: 'R' }],
+      actions: [{ label: t('nextRound'), onClick: newRound, primary: true, kbd: 'R' }],
     };
   }
 
@@ -310,8 +330,8 @@ export function ConnectFourGame(props: ArcadeGameProps = {}) {
       {!embedded && (
         <header className="arc-game__head">
           <div>
-            <h1 className="arc-game__title">Connect Four</h1>
-            <p className="arc-game__sub">Drop discs, line up four — against a deep α-β search or a friend.</p>
+            <h1 className="arc-game__title">{gameName('connect4', lang)}</h1>
+            <p className="arc-game__sub">{t('subtitle')}</p>
           </div>
         </header>
       )}
@@ -320,10 +340,10 @@ export function ConnectFourGame(props: ArcadeGameProps = {}) {
         status={status}
         statusLabel={turnLabel}
         items={[
-          { label: 'Score', value: state.roundScore },
-          { label: 'Best', value: best, highlight: newBest },
-          { label: ai === null ? 'R–Y–D' : 'W–L–D', value: `${humanWins}–${aiWins}–${state.scores.draws}` },
-          { label: 'Time', value: formatClock(seconds) },
+          { label: k('score'), value: num(state.roundScore) },
+          { label: k('best'), value: num(best), highlight: newBest },
+          { label: ai === null ? t('statRyd') : t('statWld'), value: record },
+          { label: k('time'), value: formatClock(seconds) },
         ]}
       />
 
@@ -345,17 +365,23 @@ export function ConnectFourGame(props: ArcadeGameProps = {}) {
 
         <aside className={styles.side}>
           <section className="arc-panel">
-            <h2 className="arc-panel__title">Game</h2>
+            <h2 className="arc-panel__title">{t('panelGame')}</h2>
             <div className={styles.buttons}>
               <button
                 type="button"
                 className="arc-btn arc-btn--primary"
                 onClick={status === 'running' || status === 'paused' ? togglePause : primary}
               >
-                {status === 'running' ? 'Pause' : status === 'paused' ? 'Resume' : status === 'idle' ? 'Start' : 'Next round'}
+                {status === 'running'
+                  ? k('pause')
+                  : status === 'paused'
+                    ? k('resume')
+                    : status === 'idle'
+                      ? k('start')
+                      : t('nextRound')}
               </button>
               <button type="button" className="arc-btn" onClick={newRound} disabled={status === 'idle'}>
-                New round
+                {t('newRound')}
               </button>
             </div>
             <div className={styles.save}>
@@ -364,30 +390,31 @@ export function ConnectFourGame(props: ArcadeGameProps = {}) {
           </section>
 
           <section className="arc-panel">
-            <h2 className="arc-panel__title">Series</h2>
+            <h2 className="arc-panel__title">{t('panelSeries')}</h2>
             <dl className={styles.series}>
               <div>
                 <dt>
                   <span className={`${styles.dot} ${styles.red}`} aria-hidden="true" />
-                  {ai === null ? 'Red' : 'You'}
+                  {ai === null ? t('red') : t('you')}
                 </dt>
-                <dd>{humanWins}</dd>
+                <dd>{num(humanWins)}</dd>
               </div>
               <div>
                 <dt>
                   <span className={`${styles.dot} ${styles.yellow}`} aria-hidden="true" />
-                  {ai === null ? 'Yellow' : 'AI'}
+                  {ai === null ? t('yellow') : t('ai')}
                 </dt>
-                <dd>{aiWins}</dd>
+                <dd>{num(aiWins)}</dd>
               </div>
               <div>
-                <dt>Draws</dt>
-                <dd>{state.scores.draws}</dd>
+                <dt>{t('draws')}</dt>
+                <dd>{num(state.scores.draws)}</dd>
               </div>
             </dl>
             <p className={styles.note}>
-              Round {Math.max(1, roundNumber)}
-              {ranked ? ` · ${state.points} series points` : ' · unranked'} · loser opens the next round.
+              {ranked
+                ? t('roundRanked', { n: Math.max(1, roundNumber), points: num(state.points) })
+                : t('roundUnranked', { n: Math.max(1, roundNumber) })}
             </p>
             <button
               type="button"
@@ -395,30 +422,28 @@ export function ConnectFourGame(props: ArcadeGameProps = {}) {
               onClick={() => requestReset(false)}
               disabled={!hasScores}
             >
-              Reset scores <kbd className="arc-kbd">C</kbd>
+              {t('resetScores')} <kbd className="arc-kbd">C</kbd>
             </button>
           </section>
 
           <section className="arc-panel">
-            <h2 className="arc-panel__title">Mode</h2>
+            <h2 className="arc-panel__title">{t('panelMode')}</h2>
             <ModeSelect mode={state.mode} onChange={changeMode} />
             <p className={styles.note}>
-              {ranked
-                ? `Ranked: a win pays ${base}–${base * 2} (faster wins pay more), a draw a quarter. Changing mode starts a new series.`
-                : 'Two players on one device. Unranked — rounds count as plays only.'}
+              {ranked ? t('modeNoteRanked', { min: num(base), max: num(base * 2) }) : t('modeNotePvp')}
             </p>
           </section>
 
           <section className="arc-panel">
-            <h2 className="arc-panel__title">Settings</h2>
+            <h2 className="arc-panel__title">{t('panelSettings')}</h2>
             <div className={styles.settings}>
               <AISpeedToggle speed={aiSpeed} onChange={setAISpeed} disabled={!ranked} />
             </div>
           </section>
 
           <section className="arc-panel">
-            <h2 className="arc-panel__title">Keys</h2>
-            <KeyHelp rows={KEYS} />
+            <h2 className="arc-panel__title">{t('panelKeys')}</h2>
+            <KeyHelp rows={keyRows} />
           </section>
         </aside>
       </div>
