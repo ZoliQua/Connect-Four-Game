@@ -625,7 +625,7 @@ body {
 .arc-lang__list button:hover {
   background: var(--panel-bg-soft);
 }
-.arc-lang__list button[aria-checked='true'] {
+.arc-lang__list button[aria-pressed='true'] {
   font-weight: 700;
 }
 .arc-lang__list small {

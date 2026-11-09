@@ -13,4 +13,5 @@ export * from './format';
 export * from './hooks';
 export * from './components/ArcadeUI';
 export * from './components/ArcadeShell';
+export * from './components/LangMenu';
 export * from './components/DentalIcons';

@@ -1,77 +1,11 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { useArcadeTheme, useDental, useKitMessages, useLang } from '../hooks';
-import { LANG_NAMES, LANGS, type Lang } from '../i18n';
-import { applyUrlPrefs, withPrefs } from '../prefs';
+import { applyUrlPrefs, cleanPrefParamsFromUrl, withPrefs } from '../prefs';
 import { ARCADE_AUTHOR, ARCADE_GAMES, ARCADE_PORTAL_URL, ARCADE_REPO_URL, gameInfo, gameName } from '../registry';
 import { ARCADE_KEYS, isKey, shouldIgnoreKey } from '../keyboard';
 import type { ArcadeGameId } from '../types';
 import { Tooth } from './DentalIcons';
-
-/** Globe + current code; opens a three-item language menu. */
-function LangMenu({ lang, onPick, label }: { lang: Lang; onPick: (l: Lang) => void; label: string }) {
-  const [open, setOpen] = useState(false);
-  const rootRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    const onDown = (e: PointerEvent) => {
-      if (rootRef.current && !rootRef.current.contains(e.target as Node)) setOpen(false);
-    };
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false);
-    };
-    document.addEventListener('pointerdown', onDown);
-    document.addEventListener('keydown', onKey);
-    return () => {
-      document.removeEventListener('pointerdown', onDown);
-      document.removeEventListener('keydown', onKey);
-    };
-  }, [open]);
-
-  return (
-    <div className="arc-lang" ref={rootRef}>
-      <button
-        type="button"
-        className="arc-lang__btn"
-        aria-haspopup="menu"
-        aria-expanded={open}
-        aria-label={`${label}: ${LANG_NAMES[lang]}`}
-        title={label}
-        onClick={() => setOpen((o) => !o)}
-      >
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
-          <circle cx="12" cy="12" r="9" />
-          <path d="M3 12h18M12 3c2.6 2.6 3.8 5.6 3.8 9s-1.2 6.4-3.8 9c-2.6-2.6-3.8-5.6-3.8-9S9.4 5.6 12 3z" />
-        </svg>
-        <span className="arc-lang__code">{lang.toUpperCase()}</span>
-      </button>
-      {open && (
-        <ul className="arc-menu__list arc-lang__list" role="menu" aria-label={label}>
-          {LANGS.map((l) => (
-            <li key={l} role="none">
-              <button
-                type="button"
-                role="menuitemradio"
-                aria-checked={l === lang}
-                lang={l}
-                onClick={() => {
-                  onPick(l);
-                  setOpen(false);
-                }}
-              >
-                <span className="arc-lang__mark" aria-hidden="true">
-                  {l === lang ? '✓' : ''}
-                </span>
-                {LANG_NAMES[l]}
-                <small aria-hidden="true">{l.toUpperCase()}</small>
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
-}
+import { LangMenu } from './LangMenu';
 
 /**
  * Page chrome for a game running on its own (outside the portal): the same
@@ -82,8 +16,10 @@ export function ArcadeShell({ gameId, children }: { gameId: ArcadeGameId; childr
   // `?lang=` / `?dental=` hand-off, applied once before any hook below reads the prefs.
   // Silent: it persists the values (or keeps them in memory) and updates <html>, but
   // emits no event, so nothing can re-render another component during this render.
+  // Then the params leave the address bar, so a reload cannot undo a later switch.
   useState(() => {
     applyUrlPrefs(undefined, { silent: true });
+    cleanPrefParamsFromUrl();
     return true;
   });
   const game = gameInfo(gameId);

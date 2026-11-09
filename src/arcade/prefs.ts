@@ -67,3 +67,44 @@ export function withPrefs(url: string, prefs: { lang: Lang; dental: boolean }): 
   const hash = hashAt >= 0 ? url.slice(hashAt) : '';
   return `${base}${base.includes('?') ? '&' : '?'}${params}${hash}`;
 }
+
+const PREF_PARAMS = ['lang', 'dental'];
+
+function hasPref(query: string): boolean {
+  try {
+    const params = new URLSearchParams(query);
+    return PREF_PARAMS.some((p) => params.has(p));
+  } catch {
+    return false;
+  }
+}
+
+function dropPrefs(query: string): string {
+  const params = new URLSearchParams(query);
+  for (const p of PREF_PARAMS) params.delete(p);
+  const rest = params.toString();
+  return rest ? `?${rest}` : '';
+}
+
+/**
+ * The URL without the `lang` / `dental` hand-off params (query and hash query),
+ * or null when there is nothing to remove. Once applied at boot they are
+ * saved, so leaving them in the address bar would override a later switch on reload.
+ */
+export function stripPrefParams(loc: { pathname: string; search: string; hash: string }): string | null {
+  const q = loc.hash.indexOf('?');
+  const hashPath = q >= 0 ? loc.hash.slice(0, q) : loc.hash;
+  const hashQuery = q >= 0 ? loc.hash.slice(q + 1) : '';
+  if (!hasPref(loc.search) && !hasPref(hashQuery)) return null;
+  return `${loc.pathname}${dropPrefs(loc.search)}${hashPath}${q >= 0 ? dropPrefs(hashQuery) : ''}`;
+}
+
+/** Remove the hand-off params from the address bar (no navigation, no history entry). */
+export function cleanPrefParamsFromUrl(): void {
+  try {
+    const clean = stripPrefParams(window.location);
+    if (clean !== null) window.history.replaceState(window.history.state, '', clean);
+  } catch {
+    /* keep the URL as it is */
+  }
+}
