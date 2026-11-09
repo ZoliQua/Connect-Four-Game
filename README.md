@@ -3,7 +3,7 @@
 A type-safe Connect Four built with **React 18**, **Vite** and **TypeScript** — 7 × 6 rack, falling-disc animation,
 PvP and three AI levels driven by a **bitboard negamax with α-β pruning, a transposition table and iterative deepening**.
 Runs on its own **and** as one of the eleven games of **[Zoltan's Arcade](https://github.com/ZoliQua/Arcade-Game-Center)** —
-play it at [drdul.hu/arcade/#/play/connect4](https://drdul.hu/arcade/#/play/connect4).
+play it at [dulzoltan.hu/arcade/#/play/connect4](https://dulzoltan.hu/arcade/#/play/connect4).
 
 [![CI](https://github.com/ZoliQua/Connect-Four-Game/actions/workflows/ci.yml/badge.svg)](https://github.com/ZoliQua/Connect-Four-Game/actions/workflows/ci.yml)
 ![license](https://img.shields.io/badge/license-MIT-green)
@@ -62,6 +62,8 @@ Every game is a standalone repo that also plugs into the portal. They share one 
 - 💾 **Autosave & resume** — the whole series (board, scores, points, mode) survives reloads and tab closes
 - ⚡ **AI delay** — Instant / 0.15 s / 0.4 s / 1 s thinking delay, remembered
 - 🌗 **Dark / light theme** shared with every arcade game (press **T**)
+- 🌍 **Three languages** — English, Hungarian and German; switch in the top bar or in the settings (also `?lang=en|hu|de` for link hand-off); numbers follow the locale's grouping
+- 🦷 **Dental mode** — a „Fogas mód” / "Dental mode" / „Zahnmodus” toggle in the settings, off by default (or `?dental=1`), shared across the whole arcade: the discs are teeth, incisor versus molar silhouettes (shape, not only colour); presentation only
 - 🤖 **Attract-mode demo** (`<ConnectFourDemo />`) — two shallow, slightly random AIs play the real engine on the portal's landing page
 - ⌨️ **Keyboard-first and accessible** — columns are real buttons with `aria-label`s, visible focus, roving focus;
   hotkeys are ignored while you type in a form field or hold Cmd/Ctrl/Alt

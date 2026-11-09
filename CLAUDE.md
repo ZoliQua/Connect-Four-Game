@@ -4,7 +4,7 @@
 
 * **Repository**: https://github.com/ZoliQua/Connect-Four-Game (package `connect-four-game`)
 * **Portal**: https://github.com/ZoliQua/Arcade-Game-Center — arcade id **`connect4`**, colour token `--game-connect4`,
-  play URL https://drdul.hu/arcade/#/play/connect4. The same `src/` is mirrored into `Arcade-Game-Center/apps/connect4/`.
+  play URL https://dulzoltan.hu/arcade/#/play/connect4. The same `src/` is mirrored into `Arcade-Game-Center/apps/connect4/`.
 * **Sister games**: Tetris, Snake (the reference implementation), 2048, Pac-Man, Gomoku, Tic-Tac-Toe, Breakout, Space Invaders.
   The closest siblings are Tic-Tac-Toe and Gomoku (same duel UX, scoring and round flow).
 * **Stack**: React 18.3, Vite 5.4, TypeScript 5.6, CSS Modules on the shared arcade tokens. No other runtime dependencies.

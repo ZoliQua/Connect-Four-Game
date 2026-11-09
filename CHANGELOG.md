@@ -6,6 +6,18 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [1.1.0] — 2026-11-09
+
+### Added
+
+- Three languages: English, Hungarian and German, switchable in the top bar / settings and by `?lang=en|hu|de`; the choice is shared across the arcade (`arcade.lang`).
+- Dental mode (off by default, shared `arcade.dental`, `?dental=1`): the discs are teeth, incisor versus molar silhouettes (shape, not only colour). Presentation only: rules, scores, stats and saves are unchanged.
+
+### Changed
+
+- Numbers use the locale's digit grouping.
+- Links now point to https://dulzoltan.hu/arcade/ (the arcade moved to its new domain).
+
 ### Added
 
 - Hungarian and German: every game string follows the shared arcade language (`src/i18n.ts`); the game is called „Négy a sorban” / „Vier gewinnt”.
