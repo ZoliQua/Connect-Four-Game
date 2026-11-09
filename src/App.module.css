@@ -109,6 +109,22 @@
   background: #f5c518;
 }
 
+/* Dental mode: the series labels carry the discs' silhouettes (incisor vs molar). */
+.seriesIcon {
+  display: inline-flex;
+  flex: none;
+}
+
+.seriesTooth {
+  --arc-tooth-fill: #fbfbfd;
+  --arc-tooth-stroke: #b3262a;
+}
+
+.seriesMolar {
+  --arc-tooth-fill: #f5c518;
+  --arc-tooth-stroke: #8a6a00;
+}
+
 .note {
   margin: 10px 0 0;
   font-size: 12px;

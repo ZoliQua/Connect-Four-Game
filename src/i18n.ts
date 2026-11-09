@@ -4,14 +4,14 @@ import type { Messages } from './arcade';
 export type MessageKey =
   | 'subtitle'
   | 'keyColumn' | 'keyJump' | 'keyDrop' | 'keyPause' | 'keyNewRound' | 'keyCycleMode' | 'keyResetScores'
-  | 'red' | 'yellow' | 'discRed' | 'discYellow' | 'discYoursRed' | 'discAiYellow' | 'discAiRed' | 'discYoursYellow'
+  | 'red' | 'yellow' | 'incisor' | 'molar' | 'discRed' | 'discYellow' | 'discYoursRed' | 'discAiYellow' | 'discAiRed' | 'discYoursYellow'
   | 'toMove' | 'aiThinking' | 'yourTurn'
   | 'resetTitle' | 'resetBody' | 'resetConfirm' | 'keep'
   | 'idlePvp' | 'idleAi'
   | 'welcomeBody' | 'continue' | 'newRound' | 'newSeries' | 'pausedBody'
   | 'draw' | 'colorWins' | 'youWin' | 'aiWins'
   | 'resultRanked' | 'resultNewBest' | 'resultPvp' | 'nextRound'
-  | 'statWld' | 'statRyd'
+  | 'statWld' | 'statRyd' | 'statImd'
   | 'panelGame' | 'panelSeries' | 'panelMode' | 'panelSettings' | 'panelKeys'
   | 'you' | 'ai' | 'draws'
   | 'roundRanked' | 'roundUnranked' | 'resetScores'
@@ -33,6 +33,8 @@ export const MESSAGES: Messages<MessageKey> = {
     keyResetScores: 'Reset series scores',
     red: 'Red',
     yellow: 'Yellow',
+    incisor: 'Incisor',
+    molar: 'Molar',
     discRed: 'red',
     discYellow: 'yellow',
     discYoursRed: 'yours (red)',
@@ -63,6 +65,7 @@ export const MESSAGES: Messages<MessageKey> = {
     nextRound: 'Next round',
     statWld: 'W–L–D',
     statRyd: 'R–Y–D',
+    statImd: 'I–M–D',
     panelGame: 'Game',
     panelSeries: 'Series',
     panelMode: 'Mode',
@@ -106,6 +109,8 @@ export const MESSAGES: Messages<MessageKey> = {
     keyResetScores: 'Sorozat nullázása',
     red: 'Piros',
     yellow: 'Sárga',
+    incisor: 'Metszőfog',
+    molar: 'Őrlőfog',
     discRed: 'piros',
     discYellow: 'sárga',
     discYoursRed: 'a tiéd (piros)',
@@ -136,6 +141,7 @@ export const MESSAGES: Messages<MessageKey> = {
     nextRound: 'Következő kör',
     statWld: 'Gy–V–D',
     statRyd: 'P–S–D',
+    statImd: 'M–Ő–D',
     panelGame: 'Játék',
     panelSeries: 'Sorozat',
     panelMode: 'Mód',
@@ -179,6 +185,8 @@ export const MESSAGES: Messages<MessageKey> = {
     keyResetScores: 'Serienstand zurücksetzen',
     red: 'Rot',
     yellow: 'Gelb',
+    incisor: 'Schneidezahn',
+    molar: 'Backenzahn',
     discRed: 'rot',
     discYellow: 'gelb',
     discYoursRed: 'deine (rot)',
@@ -209,6 +217,7 @@ export const MESSAGES: Messages<MessageKey> = {
     nextRound: 'Nächste Runde',
     statWld: 'S–N–U',
     statRyd: 'R–G–U',
+    statImd: 'S–B–U',
     panelGame: 'Spiel',
     panelSeries: 'Serie',
     panelMode: 'Spielmodus',

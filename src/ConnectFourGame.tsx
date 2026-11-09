@@ -7,9 +7,12 @@ import {
   gameName,
   GameOverlay,
   KeyHelp,
+  Molar,
   SaveBadge,
   StatPanel,
+  Tooth,
   useArcadeRun,
+  useDental,
   useRestoredSession,
   useRunTimer,
   useKitMessages,
@@ -59,6 +62,8 @@ const KEYS: [string, MessageKey][] = [
 ];
 
 const COLOR_NAME: Record<Player, MessageKey> = { 1: 'red', 2: 'yellow' };
+/** Dental mode draws red discs as incisors and yellow ones as molars, so the text names the shape. */
+const SHAPE_NAME: Record<Player, MessageKey> = { 1: 'incisor', 2: 'molar' };
 
 const MODE_KEY: Record<Mode, MessageKey> = {
   pvp: 'modePvp',
@@ -256,6 +261,8 @@ export function ConnectFourGame(props: ArcadeGameProps = {}) {
   const newBest = ranked && state.roundScore > 0 && state.roundScore > stats.bestBeforeRun;
   const humanWins = state.humanPlayer === 1 ? state.scores.p1 : state.scores.p2;
   const aiWins = state.humanPlayer === 1 ? state.scores.p2 : state.scores.p1;
+  const [dental] = useDental();
+  const playerName = (p: Player) => t((dental ? SHAPE_NAME : COLOR_NAME)[p]);
   const names = useMemo(() => {
     const keys = discNames(ai);
     return { 1: t(keys[1]), 2: t(keys[2]) } as Record<Player, string>;
@@ -268,7 +275,7 @@ export function ConnectFourGame(props: ArcadeGameProps = {}) {
 
   let turnLabel: string | undefined;
   if (status === 'running') {
-    if (ai === null) turnLabel = t('toMove', { color: t(COLOR_NAME[state.current]) });
+    if (ai === null) turnLabel = t('toMove', { color: playerName(state.current) });
     else turnLabel = state.current === ai ? t('aiThinking') : t('yourTurn');
   }
 
@@ -311,7 +318,7 @@ export function ConnectFourGame(props: ArcadeGameProps = {}) {
     const outcome = roundOutcome(state);
     let title: string;
     if (outcome === 'draw') title = t('draw');
-    else if (ai === null) title = t('colorWins', { color: t(COLOR_NAME[state.winner as Player]) });
+    else if (ai === null) title = t('colorWins', { color: playerName(state.winner as Player) });
     else title = outcome === 'win' ? t('youWin') : t('aiWins');
     const message = ranked
       ? t('resultRanked', { score: num(state.roundScore), discs: state.moves.length, points: num(state.points), best: num(best) }) +
@@ -343,7 +350,7 @@ export function ConnectFourGame(props: ArcadeGameProps = {}) {
         items={[
           { label: k('score'), value: num(state.roundScore) },
           { label: k('best'), value: num(best), highlight: newBest },
-          { label: ai === null ? t('statRyd') : t('statWld'), value: record },
+          { label: ai === null ? t(dental ? 'statImd' : 'statRyd') : t('statWld'), value: record },
           { label: k('time'), value: formatClock(seconds) },
         ]}
       />
@@ -395,15 +402,27 @@ export function ConnectFourGame(props: ArcadeGameProps = {}) {
             <dl className={styles.series}>
               <div>
                 <dt>
-                  <span className={`${styles.dot} ${styles.red}`} aria-hidden="true" />
-                  {ai === null ? t('red') : t('you')}
+                  {dental ? (
+                    <span className={`${styles.seriesIcon} ${styles.seriesTooth}`} data-testid="c4-series-tooth" aria-hidden="true">
+                      <Tooth size={14} />
+                    </span>
+                  ) : (
+                    <span className={`${styles.dot} ${styles.red}`} aria-hidden="true" />
+                  )}
+                  {ai === null ? playerName(1) : t('you')}
                 </dt>
                 <dd>{num(humanWins)}</dd>
               </div>
               <div>
                 <dt>
-                  <span className={`${styles.dot} ${styles.yellow}`} aria-hidden="true" />
-                  {ai === null ? t('yellow') : t('ai')}
+                  {dental ? (
+                    <span className={`${styles.seriesIcon} ${styles.seriesMolar}`} data-testid="c4-series-molar" aria-hidden="true">
+                      <Molar size={14} />
+                    </span>
+                  ) : (
+                    <span className={`${styles.dot} ${styles.yellow}`} aria-hidden="true" />
+                  )}
+                  {ai === null ? playerName(2) : t('ai')}
                 </dt>
                 <dd>{num(aiWins)}</dd>
               </div>

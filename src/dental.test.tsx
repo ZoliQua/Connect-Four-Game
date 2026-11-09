@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { applyDental } from './arcade';
+import { applyDental, applyLang } from './arcade';
 import { ConnectFourGame } from './ConnectFourGame';
 
 beforeEach(() => {
@@ -9,6 +9,7 @@ beforeEach(() => {
 });
 afterEach(() => {
   applyDental(false, { silent: true });
+  applyLang('en', { silent: true });
   vi.useRealTimers();
 });
 
@@ -49,7 +50,7 @@ describe('dental mode', () => {
       c4: column(4).getAttribute('aria-label'),
       c5: column(5).getAttribute('aria-label'),
       status: screen.getByRole('status').textContent,
-      time: container.querySelector('.arc-stats')?.textContent,
+      time: container.querySelector('.arc-stats')?.textContent?.match(/\d\d:\d\d/)?.[0],
     };
     expect(before.c4).toMatch(/1 of 6: red/);
     expect(before.status).toBe('Red to move');
@@ -59,11 +60,14 @@ describe('dental mode', () => {
     expect(screen.queryByRole('dialog')).toBeNull();
     expect(column(4).getAttribute('aria-label')).toBe(before.c4);
     expect(column(5).getAttribute('aria-label')).toBe(before.c5);
-    expect(screen.getByRole('status').textContent).toBe('Red to move');
-    expect(container.querySelector('.arc-stats')?.textContent).toBe(before.time);
+    // Same turn, named by shape (the discs are drawn as teeth now).
+    expect(screen.getByRole('status').textContent).toBe('Incisor to move');
+    expect(before.time).toBe('00:03');
+    expect(container.querySelector('.arc-stats')?.textContent?.match(/\d\d:\d\d/)?.[0]).toBe(before.time);
     expect(localStorage.getItem('arcade.dental')).toBe('1');
 
     act(() => applyDental(false));
+    expect(screen.getByRole('status').textContent).toBe('Red to move');
     expect(board().getAttribute('data-dental')).toBe('false');
     expect(column(4).getAttribute('aria-label')).toBe(before.c4);
   });
@@ -76,5 +80,30 @@ describe('dental mode', () => {
     expect(container.querySelectorAll('.disc.p1:not(.ghost)')).toHaveLength(1);
     expect(container.querySelectorAll('.disc.p2:not(.ghost)')).toHaveLength(1);
     expect(container.querySelector('.disc svg')).toBeNull();
+  });
+
+  it('names the players by shape in dental mode: status, series and result, in every language', () => {
+    applyDental(true);
+    const { container } = playTwoDiscs();
+    expect(screen.getByRole('status').textContent).toBe('Incisor to move');
+    const series = container.querySelector('.series')!;
+    expect(series.textContent).toContain('Incisor');
+    expect(series.textContent).toContain('Molar');
+    expect(series.textContent).not.toMatch(/Red|Yellow/);
+    // The series labels carry the same tooth / molar silhouettes as the discs.
+    expect(series.querySelectorAll('[data-testid="c4-series-tooth"]')).toHaveLength(1);
+    expect(series.querySelectorAll('[data-testid="c4-series-molar"]')).toHaveLength(1);
+    expect(screen.getByText('I–M–D')).toBeTruthy();
+
+    act(() => applyLang('hu'));
+    expect(screen.getByRole('status').textContent).toBe('Metszőfog lép');
+    act(() => applyLang('de'));
+    expect(screen.getByRole('status').textContent).toBe('Schneidezahn ist am Zug');
+
+    act(() => applyLang('en'));
+    // Incisor (column 4) wins with three more in a row: 4,5,4,5,4,5,4.
+    for (const c of [4, 5, 4, 5, 4]) act(() => fireEvent.click(column(c)));
+    act(() => vi.advanceTimersByTime(5000));
+    expect(screen.getByRole('dialog', { name: 'Incisor wins!' })).toBeTruthy();
   });
 });
