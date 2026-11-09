@@ -9,6 +9,7 @@ All notable changes to this project are documented here. The format follows
 ### Added
 
 - Hungarian and German: every game string follows the shared arcade language (`src/i18n.ts`); the game is called „Négy a sorban” / „Vier gewinnt”.
+- Dental mode (shared `arcade.dental`, off by default; toggle in the arcade top bar and in Settings): red discs are white incisors, yellow discs gold molars — two silhouettes, not just two colours. The winning four keep their glow; rules, scores and saves are unchanged.
 
 ## [1.0.2] — 2026-11-04
 

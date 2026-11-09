@@ -1,5 +1,5 @@
 import { memo, useEffect, useRef, type CSSProperties } from 'react';
-import { useMessages } from '../arcade';
+import { Molar, Tooth, useDental, useMessages } from '../arcade';
 import { MESSAGES, type MessageKey } from '../i18n';
 import { cellIndex, columnHeight } from '../logic/board';
 import { COLS, ROWS } from '../logic/constants';
@@ -28,6 +28,11 @@ export type GameBoardProps = {
 const noop = () => {};
 const DEFAULT_NAMES: Record<Player, MessageKey> = { 1: 'discRed', 2: 'discYellow' };
 const discClass = (p: Player) => (p === 1 ? styles.p1 : styles.p2);
+
+/** Dental mode: red discs are incisors, yellow discs gold molars — two silhouettes, not just two colours. */
+const DENTAL_TEST_ID: Record<Player, string> = { 1: 'c4-disc-tooth', 2: 'c4-disc-molar' };
+const dentalArt = (p: Player) =>
+  p === 1 ? <Tooth className={styles.tooth} size="100%" /> : <Molar className={styles.tooth} size="100%" />;
 
 type T = (key: MessageKey, vars?: Record<string, string | number>) => string;
 
@@ -61,6 +66,7 @@ export const GameBoard = memo(function GameBoard({
   variant = 'full',
 }: GameBoardProps) {
   const t = useMessages(MESSAGES);
+  const [dental] = useDental();
   const names = namesProp ?? { 1: t(DEFAULT_NAMES[1]), 2: t(DEFAULT_NAMES[2]) };
   const mini = variant === 'mini';
   const rootRef = useRef<HTMLDivElement>(null);
@@ -98,7 +104,10 @@ export const GameBoard = memo(function GameBoard({
                 .filter(Boolean)
                 .join(' ')}
               style={index === lastIndex ? ({ '--fall': row + 1 } as CSSProperties) : undefined}
-            />
+              data-testid={dental ? DENTAL_TEST_ID[value] : undefined}
+            >
+              {dental && dentalArt(value)}
+            </span>
           )}
         </span>,
       );
@@ -135,7 +144,9 @@ export const GameBoard = memo(function GameBoard({
         }}
       >
         <span className={styles.slot} aria-hidden="true">
-          {focused && playable && <span className={`${styles.disc} ${styles.ghost} ${discClass(current)}`} />}
+          {focused && playable && (
+            <span className={`${styles.disc} ${styles.ghost} ${discClass(current)}`}>{dental && dentalArt(current)}</span>
+          )}
         </span>
         {cells}
       </button>,
@@ -145,7 +156,10 @@ export const GameBoard = memo(function GameBoard({
   return (
     <div
       ref={rootRef}
-      className={[styles.board, mini ? styles.mini : '', won ? styles.over : ''].filter(Boolean).join(' ')}
+      className={[styles.board, mini ? styles.mini : '', won ? styles.over : '', dental ? styles.dental : '']
+        .filter(Boolean)
+        .join(' ')}
+      data-dental={dental}
       role={mini ? undefined : 'group'}
       aria-label={mini ? undefined : t('boardLabel')}
       aria-hidden={mini ? true : undefined}

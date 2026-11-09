@@ -211,3 +211,59 @@
     transition: none;
   }
 }
+
+/* ── Dental mode ──────────────────────────────────────────────
+ * Red discs become white incisors, yellow discs gold molars: the two sides
+ * differ by silhouette (narrow two-rooted tooth vs wide flat crown), and a
+ * soft red / yellow halo keeps the familiar colour names. Only the look
+ * changes — the disc boxes, drop animation and winning glow stay as they are. */
+.dental {
+  --arc-tooth-shine: rgba(255, 255, 255, 0.85);
+}
+
+.dental .p1,
+.dental .p2 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dental .p1 {
+  --arc-tooth-fill: #fbfbfd;
+  --arc-tooth-stroke: var(--c4-red-lo);
+  background: radial-gradient(circle, color-mix(in oklab, var(--c4-red) 42%, transparent) 0 62%, transparent 72%);
+  box-shadow: none;
+}
+
+.dental .p2 {
+  --arc-tooth-fill: var(--c4-yellow);
+  --arc-tooth-stroke: #8a6a00;
+  background: radial-gradient(circle, color-mix(in oklab, var(--c4-yellow) 34%, transparent) 0 62%, transparent 72%);
+  box-shadow: none;
+}
+
+.tooth {
+  display: block;
+  width: 94%;
+  height: 94%;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.35));
+}
+
+/* The newest-disc marker moves to a small dot under the tooth so it never covers it. */
+.dental .last::after {
+  inset: auto 43% -4%;
+  height: 14%;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 0 1.5px rgba(0, 0, 0, 0.45);
+}
+
+/* The winning four keep their white ring and pulse in dental mode. */
+.dental .win {
+  box-shadow:
+    0 0 0 3px rgba(255, 255, 255, 0.92),
+    0 0 16px 4px color-mix(in oklab, var(--ok) 70%, transparent);
+}
+
+.mini.dental .win {
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.92);
+}

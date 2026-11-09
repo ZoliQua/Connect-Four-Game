@@ -54,6 +54,12 @@
   justify-content: space-between;
 }
 
+.settings .dentalRow {
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  cursor: pointer;
+}
+
 .series {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

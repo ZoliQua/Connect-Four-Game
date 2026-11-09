@@ -21,6 +21,7 @@ import {
   type OverlayAction,
 } from './arcade';
 import { AISpeedToggle } from './components/AISpeedToggle';
+import { DentalToggle } from './components/DentalToggle';
 import { GameBoard } from './components/GameBoard';
 import { ModeSelect } from './components/ModeSelect';
 import { useAIDelay } from './hooks/useAIDelay';
@@ -438,6 +439,7 @@ export function ConnectFourGame(props: ArcadeGameProps = {}) {
             <h2 className="arc-panel__title">{t('panelSettings')}</h2>
             <div className={styles.settings}>
               <AISpeedToggle speed={aiSpeed} onChange={setAISpeed} disabled={!ranked} />
+              <DentalToggle className={styles.dentalRow} />
             </div>
           </section>
 
