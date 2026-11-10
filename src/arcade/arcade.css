@@ -43,6 +43,9 @@
   --game-connect4: #ff5c8a;
   --game-nutsort: #9fd356;
   --game-holdem: #38bdf8;
+  --game-minesweeper: #9aa4b8;
+  --game-solitaire: #2fa36b;
+  --game-ulti: #c8553d;
 
   /* Tetromino palette (matches Tetris logic/constants.ts) */
   --tetro-I: #31c7ef;
@@ -93,6 +96,9 @@
   --game-connect4: #d6336c;
   --game-nutsort: #5f9e2f;
   --game-holdem: #0284c7;
+  --game-minesweeper: #5b6577;
+  --game-solitaire: #1f7a4f;
+  --game-ulti: #9c3b27;
   --shadow-sm: 0 2px 8px rgba(15, 16, 22, 0.06);
   --shadow-md: 0 8px 24px rgba(15, 16, 22, 0.1);
   --shadow-lg: 0 18px 48px rgba(15, 16, 22, 0.14);
@@ -717,4 +723,21 @@ body {
   .arc-overlay {
     transition: none;
   }
+}
+
+/* ─── Playing card (French deck) ────────────────────────────── */
+.arc-card {
+  display: block;
+  height: auto;
+  flex: none;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35));
+  transition: transform calc(220ms * var(--anim, 1)) ease-out, filter calc(220ms * var(--anim, 1)) ease-out;
+}
+.arc-card--down {
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
+}
+/* Selected: raised and outlined (never colour alone). */
+.arc-card--selected {
+  transform: translateY(-14%);
+  filter: drop-shadow(0 0 0.5px #000) drop-shadow(0 0 6px var(--hl, #f4b860)) drop-shadow(0 6px 6px rgba(0, 0, 0, 0.45));
 }

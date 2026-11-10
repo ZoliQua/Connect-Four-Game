@@ -173,6 +173,45 @@ const GAMES: readonly Omit<ArcadeGameInfo, 'tagline'>[] = [
     },
     colorVar: '--game-holdem',
   },
+  {
+    id: 'minesweeper',
+    name: 'Minesweeper',
+    names: { hu: 'Aknakereső' },
+    repo: 'https://github.com/ZoliQua/Minesweeper-Game',
+    tag: 'Logic',
+    taglines: {
+      en: 'Classic, hex and time-attack minefields. Flag the mines, clear the rest.',
+      hu: 'Klasszikus, hatszögletű és időre menő aknamezők. Jelöld az aknákat, tisztítsd meg a többit.',
+      de: 'Klassische, hexagonale und Time-Attack-Minenfelder. Markiere die Minen, räume den Rest.',
+    },
+    colorVar: '--game-minesweeper',
+  },
+  {
+    id: 'solitaire',
+    name: 'Solitaire',
+    names: { hu: 'Pasziánsz', de: 'Solitär' },
+    repo: 'https://github.com/ZoliQua/Solitaire-Game',
+    tag: 'Cards',
+    taglines: {
+      en: 'Klondike, Spider and FreeCell in one deck of patience.',
+      hu: 'Klondike, Pók és FreeCell egyetlen pasziánsz-csomagban.',
+      de: 'Klondike, Spider und FreeCell in einem Solitär-Paket.',
+    },
+    colorVar: '--game-solitaire',
+  },
+  {
+    id: 'ulti',
+    name: 'Ulti',
+    names: {},
+    repo: 'https://github.com/ZoliQua/Ulti-Game',
+    tag: 'Cards',
+    taglines: {
+      en: 'The Hungarian card classic against two bots, with the old Tell deck.',
+      hu: 'A magyar kártyaklasszikus két gépi ellenfél ellen, a régi Tell-kártyával.',
+      de: 'Der ungarische Kartenklassiker gegen zwei Bots, mit dem alten Tell-Blatt.',
+    },
+    colorVar: '--game-ulti',
+  },
 ];
 
 export const ARCADE_GAMES: readonly ArcadeGameInfo[] = GAMES.map((g) => ({ ...g, tagline: g.taglines.en }));

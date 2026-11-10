@@ -15,3 +15,5 @@ export * from './components/ArcadeUI';
 export * from './components/ArcadeShell';
 export * from './components/LangMenu';
 export * from './components/DentalIcons';
+export * from './cardLabels';
+export * from './components/PlayingCard';
