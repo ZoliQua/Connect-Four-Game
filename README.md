@@ -2,7 +2,7 @@
 
 A type-safe Connect Four built with **React 18**, **Vite** and **TypeScript** — 7 × 6 rack, falling-disc animation,
 PvP and three AI levels driven by a **bitboard negamax with α-β pruning, a transposition table and iterative deepening**.
-Runs on its own **and** as one of the eleven games of **[Zoltan's Arcade](https://github.com/ZoliQua/Arcade-Game-Center)** —
+Runs on its own **and** as one of the fourteen games of **[Zoltan's Arcade](https://github.com/ZoliQua/Arcade-Game-Center)** —
 play it at [dulzoltan.hu/arcade/#/play/connect4](https://dulzoltan.hu/arcade/#/play/connect4).
 
 [![CI](https://github.com/ZoliQua/Connect-Four-Game/actions/workflows/ci.yml/badge.svg)](https://github.com/ZoliQua/Connect-Four-Game/actions/workflows/ci.yml)
@@ -47,6 +47,9 @@ Every game is a standalone repo that also plugs into the portal. They share one 
 | 🔴 **Connect Four** (this repo) | [Connect-Four-Game](https://github.com/ZoliQua/Connect-Four-Game) | Duel |
 | 🔩 Nut Sort | [Nut-Sort-Game](https://github.com/ZoliQua/Nut-Sort-Game) | Sorting |
 | 🃏 Texas Hold'em | [Texas-Holdem-Game](https://github.com/ZoliQua/Texas-Holdem-Game) | Cards |
+| 💣 Minesweeper | [Minesweeper-Game](https://github.com/ZoliQua/Minesweeper-Game) | Logic |
+| ♠️ Solitaire | [Solitaire-Game](https://github.com/ZoliQua/Solitaire-Game) | Cards |
+| 🎴 Ulti | [Ulti-Game](https://github.com/ZoliQua/Ulti-Game) | Cards |
 
 ## ✨ Features
 

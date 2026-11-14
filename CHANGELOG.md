@@ -6,6 +6,13 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [1.1.1] — 2026-11-14
+
+### Changed
+
+- Vendored kit (`src/arcade/`) updated: the registry knows the three new arcade games, Minesweeper, Solitaire and Ulti, with their accent colours.
+- README: the Zoltan's Arcade family table lists all fourteen games.
+
 ## [1.1.0] — 2026-11-09
 
 ### Added
