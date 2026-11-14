@@ -78,7 +78,12 @@ describe('Connect Four rules dialog', () => {
 
   it('the Mode panel note shows the same real range, not base to double', () => {
     render(<ConnectFourGame />);
-    expect(document.body.textContent).toContain('250–458');
+    const text = document.body.textContent ?? '';
+    const range = (d: D) => `${formatNumber(win(d, 42), 'hu')}–${formatNumber(win(d, 7), 'hu')}`;
+    expect(text).toContain(`Pontozott: egy győzelem ${range('medium')} pontot ér (a gyorsabb többet), egy döntetlen a negyedét.`);
+    act(() => applyLang('de'));
+    expect(document.body.textContent).toContain(`Gewertet: Ein Sieg bringt ${range('medium')} (schnellere Siege mehr), ein Unentschieden ein Viertel.`);
+    act(() => applyLang('hu'));
     expect(document.body.textContent).not.toContain('250–500');
   });
 

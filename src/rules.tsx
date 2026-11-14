@@ -63,7 +63,7 @@ export function FourDiagram() {
     column.map((p, r) => <Disc key={`d${c}${r}`} player={p as 1 | 2} col={c} row={r} dental={dental} />),
   );
   return (
-    <svg viewBox="0 0 280 150" role="img" aria-label={m('rulesDiagramLabel')} style={{ width: '100%', maxWidth: 300, height: 'auto', display: 'block', margin: '8px auto' }}>
+    <svg viewBox="0 0 230 176" role="img" aria-label={m('rulesDiagramLabel')} style={{ width: '100%', maxWidth: 300, height: 'auto', display: 'block', margin: '8px auto' }}>
       {holes}
       {discs}
       <path
@@ -73,8 +73,8 @@ export function FourDiagram() {
         strokeDasharray="7 4"
         strokeLinecap="round"
       />
-      <path d="M222 52l10 10 20-24" fill="none" stroke="var(--text)" strokeWidth={5} strokeLinecap="round" strokeLinejoin="round" />
-      <text x={237} y={90} fontSize="11" fontWeight="700" fill="var(--text)" textAnchor="middle">
+      <path d="M192 52l10 10 20-24" fill="none" stroke="var(--text)" strokeWidth={5} strokeLinecap="round" strokeLinejoin="round" />
+      <text x={97} y={170} fontSize="12" fontWeight="700" fill="var(--text)" textAnchor="middle">
         {m('rulesDiagramRow')}
       </text>
     </svg>

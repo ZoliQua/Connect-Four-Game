@@ -72,3 +72,16 @@ describe('Connect Four touch controls', () => {
     expect(document.documentElement.dataset.arcadeImmersive).toBeUndefined();
   });
 });
+
+describe('Connect Four mouse hover (no touch)', () => {
+  it('moves the column cursor on mouseEnter', () => {
+    setCoarsePointer(false);
+    render(<ConnectFourGame />);
+    act(() => key(' '));
+    fireEvent.mouseEnter(column(1));
+    expect(column(1).getAttribute('tabindex')).toBe('0');
+    fireEvent.mouseEnter(column(6));
+    expect(column(6).getAttribute('tabindex')).toBe('0');
+    expect(column(1).getAttribute('tabindex')).toBe('-1');
+  });
+});
