@@ -1,8 +1,10 @@
 # 🔴 Connect Four
 
+**English** · [Deutsch](README.de.md) · [Magyar](README.hu.md)
+
 A type-safe Connect Four built with **React 18**, **Vite** and **TypeScript** — 7 × 6 rack, falling-disc animation,
 PvP and three AI levels driven by a **bitboard negamax with α-β pruning, a transposition table and iterative deepening**.
-Runs on its own **and** as one of the fourteen games of **[Zoltan's Arcade](https://github.com/ZoliQua/Arcade-Game-Center)** —
+Runs on its own **and** as one of the fifteen games of **[Zoltan's Arcade](https://github.com/ZoliQua/Arcade-Game-Center)** —
 play it at [dulzoltan.hu/arcade/#/play/connect4](https://dulzoltan.hu/arcade/#/play/connect4).
 
 [![CI](https://github.com/ZoliQua/Connect-Four-Game/actions/workflows/ci.yml/badge.svg)](https://github.com/ZoliQua/Connect-Four-Game/actions/workflows/ci.yml)
@@ -20,6 +22,7 @@ play it at [dulzoltan.hu/arcade/#/play/connect4](https://dulzoltan.hu/arcade/#/p
 - [Features](#-features)
 - [Quick start](#-quick-start)
 - [Controls](#%EF%B8%8F-controls)
+- [On a phone](#-on-a-phone)
 - [Scoring & stats](#-scoring--stats)
 - [Autosave & resume](#-autosave--resume)
 - [Embedding in Arcade-Game-Center](#-embedding-in-arcade-game-center)
@@ -50,6 +53,7 @@ Every game is a standalone repo that also plugs into the portal. They share one 
 | 💣 Minesweeper | [Minesweeper-Game](https://github.com/ZoliQua/Minesweeper-Game) | Logic |
 | ♠️ Solitaire | [Solitaire-Game](https://github.com/ZoliQua/Solitaire-Game) | Cards |
 | 🎴 Ulti | [Ulti-Game](https://github.com/ZoliQua/Ulti-Game) | Cards |
+| 🂡 Snapszer | [Snapszer-Game](https://github.com/ZoliQua/Snapszer-Game) | Cards |
 
 ## ✨ Features
 
@@ -61,6 +65,9 @@ Every game is a standalone repo that also plugs into the portal. They share one 
 - 🏆 **Unified arcade scoring** — every round is scored with the shared duel formula; Best, plays and wins are shared with the portal
 - 📊 **Series scoreboard** — You / AI / Draws (Red / Yellow / Draws in PvP) plus series points
 - 🔄 **Loser-goes-first** — the previous round's loser opens the next round (draws and abandoned rounds alternate)
+- 📖 **Rules dialog** — goal, how to play, rules, real score ranges and a diagram (press the **Rules** button; opening it pauses the round)
+- 🏁 **Finish early** — ends the whole match on purpose after a confirm and ranks the current round's score (0 until the round is decided; unranked in PvP)
+- 📱 **Phone-friendly** — tap anywhere in a column to drop a disc, no double tap, no page scroll or zoom on the board; a **Full screen** button hides the browser bars
 - ⏸️ **Pause** (P / Esc, or automatically when the tab is hidden) — freezes the board, the AI and the round timer
 - 💾 **Autosave & resume** — the whole series (board, scores, points, mode) survives reloads and tab closes
 - ⚡ **AI delay** — Instant / 0.15 s / 0.4 s / 1 s thinking delay, remembered
@@ -101,9 +108,17 @@ Production build: `npm run build && npm run preview`. The build uses relative as
 | **Shift + C** | Reset series scores without asking |
 | **T** | Toggle dark / light theme (standalone page) |
 
-Arrow keys call `preventDefault()` so the page never scrolls. Each column is a `<button>` labelled with its contents
+On a phone the Controls panel shows the touch help instead of the keys. Arrow keys call `preventDefault()` so the page never scrolls. Each column is a `<button>` labelled with its contents
 (`Column 4, 2 of 6: yours (red), AI (yellow) (bottom up)`); when a column has keyboard focus, focus follows the cursor.
 Enter / Space on a focused button activate that button natively.
+
+### 📱 On a phone
+
+Tap **anywhere in a column** — on a hole or in the gap between holes — and your disc drops there; the first tap already counts
+(on touch screens the hover preview is off, so iOS never swallows it). The board resizes to fit 360 px portrait without
+horizontal scrolling. The **Rules** button explains the game, **Finish** ends the match early (the current round's score — 0 until
+it is decided — goes on the leaderboard) and **Full screen** hides the browser bars. On an iPhone use *Share → Add to Home Screen*
+for a bar-free view.
 
 ## 🎯 Scoring & stats
 
@@ -116,6 +131,10 @@ Gomoku and Tic-Tac-Toe use), from the human's side, with `moves` = discs dropped
 | Draw | `base / 4` | 25 | 63 | 125 |
 | Loss | 0 | 0 | 0 | 0 |
 | PvP | 0 — unranked | | | |
+
+**Finish early** ends the whole match (the autosave is deleted) and ranks the current round's score, which is 0 until the round is
+decided; in local two-player it is unranked. The Rules dialog and the Mode panel print the real range, from a 42-disc win (the base)
+to a 7-disc win.
 
 The stat strip shows:
 
@@ -137,8 +156,8 @@ The session is the **whole series**, not just the round: board, column history, 
 points (key `arcade.session.connect4`, schema-versioned). It is checked by a strict validator that **replays the saved column list**
 and rejects anything that does not match exactly (floating discs, a disc after a win, wrong turn order, a wrong highlight).
 It is saved about once a second, whenever the page is hidden and when the game unmounts — and it is kept **between rounds**.
-Reloading shows **Welcome back** with the series paused (*Continue* · *New round* · *New series*); a round that had already
-finished is not replayed — the series continues with a fresh round. Only **Discard** next to the *Autosaved* badge (back to an
+Finishing early deletes the save. Reloading shows **Welcome back** with the series paused (*Continue* · *New round* · *New series*); a round that had already
+finished is not replayed — the series continues with a fresh round. Otherwise only **Discard** next to the *Autosaved* badge (back to an
 idle board), *Reset scores* or a mode change drop it.
 
 ## 🧩 Embedding in Arcade-Game-Center
@@ -148,7 +167,7 @@ import { ConnectFourGame, ConnectFourDemo } from '@arcade/connect4';
 
 <ConnectFourGame
   embedded                                   // hide the page title; the portal shows it
-  onGameOver={(score) => submitScore('connect4', score)}   // ranked rounds with points > 0
+  onGameOver={(score, info) => submitScore('connect4', score, info?.finished)}   // ranked rounds with points > 0, and Finish early (even at 0)
   onRunEnd={(run) => console.log(run.outcome, run.ranked)} // every round, PvP included
   onStatusChange={({ status, score, seconds }) => updateHeader(status, seconds)}
 />
@@ -239,6 +258,7 @@ src/
     persist.ts            strict runtime validation of saved sessions (replays the moves)
   hooks/                  useAITurn, useConnectFourKeys, useAIDelay
   components/             GameBoard (full + mini), ModeSelect, AISpeedToggle
+  rules.tsx               rules sections and the FourDiagram
   demo/ConnectFourDemo.tsx  landing-page attract mode
   ConnectFourGame.tsx     the embeddable game (ArcadeGameProps)
   App.tsx                 standalone page: <ArcadeShell><ConnectFourGame/></ArcadeShell>

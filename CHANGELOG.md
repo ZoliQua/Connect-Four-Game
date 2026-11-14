@@ -6,6 +6,20 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [1.2.0] — 2026-11-14
+
+### Added
+
+- Rules dialog (Rules button) with goal, how to play, rules, the real score ranges and a diagram; opening it pauses the round.
+- Finish early: ends the whole match after a confirm and ranks the current round's score (0 until the round is decided; unranked in PvP).
+- Touch controls: tap anywhere in a column to drop a disc (first tap always counts), touch help, board sized from its container.
+- Full-screen button (browser full screen, CSS fallback on iPhone); `viewport-fit=cover` for iOS safe areas.
+- README in three languages (English, German, Hungarian); the family table lists all fifteen games.
+
+### Fixed
+
+- The Mode panel note printed base to double the base as the win range; it now shows the real range (base to the fastest 7-disc win).
+
 ## [1.1.1] — 2026-11-14
 
 ### Changed
