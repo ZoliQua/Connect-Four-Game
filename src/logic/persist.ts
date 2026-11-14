@@ -4,7 +4,7 @@ import { MODES } from './game';
 import type { GameState, Mode, Player, RoundStatus } from './types';
 
 /** What a saved session stores: the whole series (board, scores, points, mode). */
-export type SavedGame = GameState;
+export type SavedGame = Omit<GameState, 'finishedEarly'>;
 
 const STATUSES: readonly RoundStatus[] = ['playing', 'won', 'draw'];
 

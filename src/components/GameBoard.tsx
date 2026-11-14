@@ -1,5 +1,5 @@
 import { memo, useEffect, useRef, type CSSProperties } from 'react';
-import { Molar, Tooth, useDental, useMessages } from '../arcade';
+import { Molar, Tooth, useDental, useIsTouch, useMessages } from '../arcade';
 import { MESSAGES, type MessageKey } from '../i18n';
 import { cellIndex, columnHeight } from '../logic/board';
 import { COLS, ROWS } from '../logic/constants';
@@ -67,6 +67,8 @@ export const GameBoard = memo(function GameBoard({
 }: GameBoardProps) {
   const t = useMessages(MESSAGES);
   const [dental] = useDental();
+  // On touch, "hover" must not change the DOM: iOS would then swallow the first tap on a column.
+  const touch = useIsTouch();
   const names = namesProp ?? { 1: t(DEFAULT_NAMES[1]), 2: t(DEFAULT_NAMES[2]) };
   const mini = variant === 'mini';
   const rootRef = useRef<HTMLDivElement>(null);
@@ -140,7 +142,7 @@ export const GameBoard = memo(function GameBoard({
         }}
         onFocus={() => onFocusCol(col)}
         onMouseEnter={() => {
-          if (interactive) onFocusCol(col);
+          if (interactive && !touch) onFocusCol(col);
         }}
       >
         <span className={styles.slot} aria-hidden="true">

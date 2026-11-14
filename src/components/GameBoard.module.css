@@ -55,6 +55,7 @@
   font: inherit;
   cursor: default;
   outline: none;
+  touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -87,9 +88,14 @@
   cursor: pointer;
 }
 
-.playable:hover .cell,
 .focused.playable .cell {
   background: color-mix(in oklab, var(--grid-empty) 82%, var(--game-color, var(--accent)));
+}
+
+@media (hover: hover) {
+  .playable:hover .cell {
+    background: color-mix(in oklab, var(--grid-empty) 82%, var(--game-color, var(--accent)));
+  }
 }
 
 .disc {

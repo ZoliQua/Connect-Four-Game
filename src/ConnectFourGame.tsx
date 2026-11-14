@@ -1,18 +1,22 @@
-import { useCallback, useEffect, useMemo, useReducer, useState, type CSSProperties } from 'react';
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState, type CSSProperties } from 'react';
 import {
   clearSession,
-  DUEL_BASE_POINTS,
   formatClock,
+  FinishButton,
   formatNumber,
+  FullscreenButton,
   gameName,
   GameOverlay,
   KeyHelp,
   Molar,
+  RulesButton,
   SaveBadge,
   StatPanel,
   Tooth,
+  TouchHelp,
   useArcadeRun,
   useDental,
+  useImmersive,
   useRestoredSession,
   useRunTimer,
   useKitMessages,
@@ -32,10 +36,11 @@ import { useAITurn } from './hooks/useAITurn';
 import { useConnectFourKeys } from './hooks/useConnectFourKeys';
 import { replayMoves } from './logic/board';
 import { COLS } from './logic/constants';
-import { advanceGame, aiPlayerFor, createInitialState, isHumanTurn, MODES, roundOutcome } from './logic/game';
+import { advanceGame, aiPlayerFor, createInitialState, isHumanTurn, MODES, roundOutcome, winScoreRange } from './logic/game';
 import { isConnectFourSession, type SavedGame } from './logic/persist';
 import type { GameState, Mode, Player } from './logic/types';
 import { MESSAGES, type MessageKey } from './i18n';
+import { useRulesSections } from './rules';
 import styles from './App.module.css';
 
 /** Bump when SavedGame changes shape; older saves are then discarded. */
@@ -95,17 +100,23 @@ export function ConnectFourGame(props: ArcadeGameProps = {}) {
   const [state, dispatch] = useReducer(advanceGame, undefined, (): GameState => {
     // Ranked by default: the arcade scores rounds against the AI; PvP is one click away.
     if (!restored) return createInitialState({ mode: 'medium' });
-    return restoredInProgress ? restored.data : advanceGame(restored.data, { type: 'newRound' });
+    return restoredInProgress ? { ...restored.data } : advanceGame(restored.data, { type: 'newRound' });
   });
   const [phase, setPhase] = useState<Phase>(restored ? 'paused' : 'idle');
   const [runKey, setRunKey] = useState(0);
   const [welcomeBack, setWelcomeBack] = useState(restored !== null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [showResult, setShowResult] = useState(false);
+  // The Finish confirm is open: the AI and the clock stand still without leaving `running`.
+  const [finishOpen, setFinishOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const immersive = useImmersive(rootRef);
+  const rulesSections = useRulesSections();
 
   const { speed: aiSpeed, delayMs: aiDelay, setSpeed: setAISpeed } = useAIDelay();
 
-  const roundOver = state.status !== 'playing';
+  const finished = state.finishedEarly === true;
+  const roundOver = state.status !== 'playing' || finished;
   const status: ArcadeStatus =
     phase === 'idle' ? 'idle' : roundOver ? 'gameOver' : phase === 'paused' ? 'paused' : 'running';
   const running = status === 'running';
@@ -113,7 +124,7 @@ export function ConnectFourGame(props: ArcadeGameProps = {}) {
   const ai = aiPlayerFor(state);
   const humanTurn = isHumanTurn(state);
 
-  const seconds = useRunTimer(running, runKey, runKey === 0 && restoredInProgress ? (restored?.seconds ?? 0) : 0);
+  const seconds = useRunTimer(running && !finishOpen, runKey, runKey === 0 && restoredInProgress ? (restored?.seconds ?? 0) : 0);
 
   const stats = useArcadeRun({
     gameId: 'connect4',
@@ -121,24 +132,29 @@ export function ConnectFourGame(props: ArcadeGameProps = {}) {
     score: state.roundScore,
     seconds,
     runKey,
-    outcome: () => roundOutcome(state),
+    outcome: () => (state.finishedEarly ? 'finished' : roundOutcome(state)),
     ranked,
     props,
   });
 
+  const saved = useMemo(() => {
+    const { finishedEarly, ...rest } = state;
+    void finishedEarly;
+    return rest;
+  }, [state]);
   const savedAt = useSessionAutosave({
     gameId: 'connect4',
     schema: SESSION_SCHEMA,
     // The whole series (board, scores, points, mode) is the session: it is
     // kept between rounds and only dropped on an explicit discard.
-    enabled: phase !== 'idle',
-    discard: phase === 'idle',
-    data: state,
+    enabled: phase !== 'idle' && !finished,
+    discard: phase === 'idle' || finished,
+    data: saved,
     seconds,
     score: state.points,
   });
 
-  useAITurn(state, dispatch, aiDelay, running && !confirmOpen);
+  useAITurn(state, dispatch, aiDelay, running && !confirmOpen && !finishOpen);
 
   useEffect(() => {
     if (!roundOver) {
@@ -164,6 +180,7 @@ export function ConnectFourGame(props: ArcadeGameProps = {}) {
     if (newRound) dispatch({ type: 'newRound' });
     setWelcomeBack(false);
     setConfirmOpen(false);
+    setFinishOpen(false);
     setPhase('live');
     setRunKey((k) => k + 1);
   }, []);
@@ -171,7 +188,27 @@ export function ConnectFourGame(props: ArcadeGameProps = {}) {
   // The idle state already holds a fresh round; just open it.
   const start = useCallback(() => beginRound(false), [beginRound]);
 
-  const newRound = useCallback(() => beginRound(phase !== 'idle'), [phase, beginRound]);
+  const newSeries = useCallback(() => {
+    dispatch({ type: 'resetScores' });
+    beginRound(true);
+  }, [beginRound]);
+
+  // After Finish the match is over: the next round starts a fresh series.
+  const newRound = useCallback(() => {
+    if (finished) newSeries();
+    else beginRound(phase !== 'idle');
+  }, [finished, phase, beginRound, newSeries]);
+
+  const openRules = useCallback((open: boolean) => {
+    if (!open) return;
+    setPhase((p) => (p === 'live' ? 'paused' : p));
+  }, []);
+
+  const finishEarly = useCallback(() => {
+    setWelcomeBack(false);
+    setConfirmOpen(false);
+    dispatch({ type: 'finish' });
+  }, []);
 
   const togglePause = useCallback(() => {
     if (roundOver) return;
@@ -188,11 +225,6 @@ export function ConnectFourGame(props: ArcadeGameProps = {}) {
     },
     [state.mode, phase, beginRound],
   );
-
-  const newSeries = useCallback(() => {
-    dispatch({ type: 'resetScores' });
-    beginRound(true);
-  }, [beginRound]);
 
   const hasScores = state.scores.p1 > 0 || state.scores.p2 > 0 || state.scores.draws > 0 || state.points > 0;
   const requestReset = useCallback(
@@ -219,7 +251,7 @@ export function ConnectFourGame(props: ArcadeGameProps = {}) {
     setRunKey((k) => k + 1);
   }, [state.mode]);
 
-  const interactive = running && humanTurn && !confirmOpen;
+  const interactive = running && humanTurn && !confirmOpen && !finishOpen;
   const drop = useCallback(
     (col: number) => {
       if (!interactive) return;
@@ -314,27 +346,30 @@ export function ConnectFourGame(props: ArcadeGameProps = {}) {
             { label: t('newRound'), onClick: newRound, kbd: 'R' },
           ],
         };
-  } else if (status === 'gameOver' && showResult) {
+  } else if (status === 'gameOver' && (showResult || finished)) {
     const outcome = roundOutcome(state);
     let title: string;
-    if (outcome === 'draw') title = t('draw');
+    if (finished) title = k('finishedEarly');
+    else if (outcome === 'draw') title = t('draw');
     else if (ai === null) title = t('colorWins', { color: playerName(state.winner as Player) });
     else title = outcome === 'win' ? t('youWin') : t('aiWins');
-    const message = ranked
+    const message = finished
+      ? t('finishedBody')
+      : ranked
       ? t('resultRanked', { score: num(state.roundScore), discs: state.moves.length, points: num(state.points), best: num(best) }) +
         (newBest ? t('resultNewBest') : '')
       : t('resultPvp');
     overlay = {
       title,
       message,
-      actions: [{ label: t('nextRound'), onClick: newRound, primary: true, kbd: 'R' }],
+      actions: [{ label: finished ? t('newSeries') : t('nextRound'), onClick: newRound, primary: true, kbd: 'R' }],
     };
   }
 
-  const base = ranked ? DUEL_BASE_POINTS[state.mode as Exclude<Mode, 'pvp'>] : 0;
+  const range = ranked ? winScoreRange(state.mode as Exclude<Mode, 'pvp'>) : null;
 
   return (
-    <div className={`arc-game ${styles.game}`} style={{ '--game-color': 'var(--game-connect4)' } as CSSProperties}>
+    <div ref={rootRef} className={`arc-game ${styles.game}`} style={{ '--game-color': 'var(--game-connect4)' } as CSSProperties}>
       {!embedded && (
         <header className="arc-game__head">
           <div>
@@ -356,7 +391,7 @@ export function ConnectFourGame(props: ArcadeGameProps = {}) {
       />
 
       <div className={styles.layout}>
-        <div className={`arc-game__board ${styles.boardWrap}`}>
+        <div className={`arc-game__board arc-board-tap ${styles.boardWrap}`}>
           <GameBoard
             board={state.board}
             lastIndex={lastIndex}
@@ -391,6 +426,11 @@ export function ConnectFourGame(props: ArcadeGameProps = {}) {
               <button type="button" className="arc-btn" onClick={newRound} disabled={status === 'idle'}>
                 {t('newRound')}
               </button>
+            </div>
+            <div className={styles.tools}>
+              <RulesButton sections={rulesSections} gameId="connect4" onOpenChange={openRules} hotkey={false} />
+              <FinishButton score={state.roundScore} visible={phase !== 'idle' && !roundOver} onFinish={finishEarly} onOpenChange={setFinishOpen} />
+              <FullscreenButton immersive={immersive} />
             </div>
             <div className={styles.save}>
               <SaveBadge savedAt={phase !== 'idle' ? savedAt : null} onDiscard={discardSave} />
@@ -450,7 +490,7 @@ export function ConnectFourGame(props: ArcadeGameProps = {}) {
             <h2 className="arc-panel__title">{t('panelMode')}</h2>
             <ModeSelect mode={state.mode} onChange={changeMode} />
             <p className={styles.note}>
-              {ranked ? t('modeNoteRanked', { min: num(base), max: num(base * 2) }) : t('modeNotePvp')}
+              {ranked ? t('modeNoteRanked', { min: num(range?.min ?? 0), max: num(range?.max ?? 0) }) : t('modeNotePvp')}
             </p>
           </section>
 
@@ -465,6 +505,7 @@ export function ConnectFourGame(props: ArcadeGameProps = {}) {
           <section className="arc-panel">
             <h2 className="arc-panel__title">{t('panelKeys')}</h2>
             <KeyHelp rows={keyRows} />
+            <TouchHelp rows={[[t('touchTap'), t('touchTapAction')]]} />
           </section>
         </aside>
       </div>

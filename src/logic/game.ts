@@ -50,6 +50,20 @@ export const createInitialState = (opts: CreateInitialOptions = {}): GameState =
   };
 };
 
+/** Fewest discs a won round can have: the winner's fourth disc is the seventh disc overall. */
+export const FASTEST_WIN_MOVES = 7;
+
+/** Reachable win scores of a ranked mode: slowest (full board) to fastest (7 discs), from the real scoring. */
+export const winScoreRange = (mode: Exclude<Mode, 'pvp'>): { min: number; max: number } => {
+  const win = (moves: number) =>
+    duelRoundScore({ outcome: 'win', difficulty: difficultyFor(mode), moves, boardCells: BOARD_CELLS });
+  return { min: win(BOARD_CELLS), max: win(FASTEST_WIN_MOVES) };
+};
+
+/** Score of a drawn round in a ranked mode. */
+export const drawScore = (mode: Exclude<Mode, 'pvp'>): number =>
+  duelRoundScore({ outcome: 'draw', difficulty: difficultyFor(mode), moves: BOARD_CELLS, boardCells: BOARD_CELLS });
+
 /** Scores a finished round with the shared arcade duel formula. */
 const scoreRound = (state: GameState): GameState => {
   const roundScore = duelRoundScore({
@@ -99,18 +113,21 @@ const applyDrop = (state: GameState, col: number): GameState => {
 };
 
 /** A fresh, empty round on top of the current series. */
-const freshRound = (state: GameState, startingPlayer: Player): GameState => ({
-  ...state,
-  board: EMPTY_BOARD,
-  moves: [],
-  current: startingPlayer,
-  startingPlayer,
-  status: 'playing',
-  winner: null,
-  winningCells: null,
-  focusCol: CENTER_COL,
-  roundScore: 0,
-});
+const freshRound = ({ finishedEarly, ...state }: GameState, startingPlayer: Player): GameState => {
+  void finishedEarly;
+  return {
+    ...state,
+    board: EMPTY_BOARD,
+    moves: [],
+    current: startingPlayer,
+    startingPlayer,
+    status: 'playing',
+    winner: null,
+    winningCells: null,
+    focusCol: CENTER_COL,
+    roundScore: 0,
+  };
+};
 
 /** The pure reducer of the engine. Never calls the AI: the AI's column arrives in `aiMove`. */
 export const advanceGame = (state: GameState, action: GameAction): GameState => {
@@ -147,6 +164,9 @@ export const advanceGame = (state: GameState, action: GameAction): GameState => 
         scores: { p1: 0, p2: 0, draws: 0 },
         points: 0,
       };
+
+    case 'finish':
+      return state.status === 'playing' ? { ...state, finishedEarly: true } : state;
 
     case 'resetScores':
       return { ...state, scores: { p1: 0, p2: 0, draws: 0 }, points: 0 };

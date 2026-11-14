@@ -34,6 +34,13 @@
   flex: 1;
 }
 
+.tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
 .reset {
   width: 100%;
   margin-top: 10px;

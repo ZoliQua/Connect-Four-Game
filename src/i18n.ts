@@ -19,7 +19,8 @@ export type MessageKey =
   | 'modeGroup' | 'modePvp' | 'modeEasy' | 'modeMedium' | 'modeHard'
   | 'hintPvp' | 'hintEasy' | 'hintMedium' | 'hintHard'
   | 'aiDelay' | 'speedInstant' | 'speedFast' | 'speedNormal' | 'speedSlow'
-  | 'colFull' | 'colEmpty' | 'colPartial' | 'boardLabel';
+  | 'colFull' | 'colEmpty' | 'colPartial' | 'boardLabel'
+  | 'rulesDiagramLabel' | 'rulesDiagramRow' | 'rulesGoal' | 'rulesPlayKeys' | 'rulesPlayTouch' | 'rulesRulesWin' | 'rulesRulesTurn' | 'rulesRulesSave' | 'rulesScoringIntro' | 'rulesScoringMode' | 'rulesScoringPvp' | 'rulesScoringFinish' | 'rulesDentalText' | 'rulesMobileTap' | 'rulesMobileFs' | 'touchTap' | 'touchTapAction' | 'finishedBody';
 
 export const MESSAGES: Messages<MessageKey> = {
   en: {
@@ -97,6 +98,24 @@ export const MESSAGES: Messages<MessageKey> = {
     colEmpty: 'Column {n}, empty',
     colPartial: 'Column {n}, {count} of {rows}: {discs} (bottom up)',
     boardLabel: 'Connect Four board',
+    rulesDiagramLabel: 'Diagram: four red discs in a row, in a line and on a diagonal, each marked with a tick.',
+    rulesDiagramRow: 'four in a line',
+    rulesGoal: 'Drop discs into the seven columns and be the first to line up four of your own — across, up and down, or diagonally.',
+    rulesPlayKeys: 'Move the cursor with the arrow keys (or A D) or jump with 1–7, then drop with Enter, Space or the down arrow — or just click a column. P or Esc pauses, R starts a new round, N cycles the mode.',
+    rulesPlayTouch: 'Tap anywhere in a column and your disc drops there. Tap Start first; the buttons below the board pause, start a new round or finish.',
+    rulesRulesWin: 'A disc falls to the lowest free hole of its column. The first player with four in a line wins; a full board without one is a draw.',
+    rulesRulesTurn: 'You play red against the AI (or take turns with a friend in PvP). The loser opens the next round; after a draw the opener alternates.',
+    rulesRulesSave: 'Your series is autosaved, so you can leave and continue later.',
+    rulesScoringIntro: 'Every round against the AI is ranked. A win pays more the fewer discs are on the board, a draw a quarter of the base, a loss nothing:',
+    rulesScoringMode: '{mode}: win {min}–{max}, draw {draw}',
+    rulesScoringPvp: 'PvP rounds are just for fun and score {zero}.',
+    rulesScoringFinish: 'Finish early ends the whole match and ranks the score of the current round, which is {zero} until the round is decided.',
+    rulesDentalText: 'Dental mode only changes the look: red discs are incisors and yellow discs are molars, so the two sides differ by shape, not just colour. Rules and scoring stay the same.',
+    rulesMobileTap: 'Tap anywhere in a column to drop your disc there.',
+    rulesMobileFs: 'The "Full screen" button hides the browser bars.',
+    touchTap: 'Tap a column',
+    touchTapAction: 'Drop a disc',
+    finishedBody: 'The match is over. Start a new series whenever you like.',
   },
   hu: {
     subtitle: 'Dobd be a korongokat, rakj ki négyet egy sorba — egy mély α-β keresés vagy egy barátod ellen.',
@@ -173,6 +192,24 @@ export const MESSAGES: Messages<MessageKey> = {
     colEmpty: '{n}. oszlop, üres',
     colPartial: '{n}. oszlop, {rows}-ból {count}: {discs} (alulról felfelé)',
     boardLabel: 'Négy a sorban tábla',
+    rulesDiagramLabel: 'Ábra: négy piros korong egy sorban, egy vonalban és átlósan, mindegyik pipával jelölve.',
+    rulesDiagramRow: 'négy egy vonalban',
+    rulesGoal: 'Dobd a korongokat a hét oszlopba, és te rakj ki először négyet a sajátjaidból – vízszintesen, függőlegesen vagy átlósan.',
+    rulesPlayKeys: 'A kurzort a nyílbillentyűkkel (vagy A D) mozgathatod, 1–7-tel az adott oszlopra ugorhatsz, Enterrel, szóközzel vagy a lefelé nyíllal bedobhatsz – vagy egyszerűen kattints egy oszlopra. P vagy Esc szünetel, R új kört indít, N módot vált.',
+    rulesPlayTouch: 'Koppints az oszlop bármely pontjára, és a korongod ott esik be. Előbb koppints az Indításra; a tábla alatti gombokkal szüneteltethetsz, új kört indíthatsz vagy befejezheted a játékot.',
+    rulesRulesWin: 'A korong az oszlop legalsó szabad lyukába esik. Az nyer, aki először rak ki négyet egy vonalban; ha megtelik a tábla négy nélkül, döntetlen.',
+    rulesRulesTurn: 'Te pirossal játszol a gép ellen (kétszemélyes módban felváltva egy baráttal). A vesztes kezdi a következő kört; döntetlen után a kezdő váltakozik.',
+    rulesRulesSave: 'A sorozatod automatikusan mentődik, így később folytathatod.',
+    rulesScoringIntro: 'Minden kör a gép ellen rangsorolt. A győzelem annál többet ér, minél kevesebb korong van a táblán, a döntetlen az alap negyedét, a vereség semmit:',
+    rulesScoringMode: '{mode}: győzelem {min}–{max}, döntetlen {draw}',
+    rulesScoringPvp: 'A PvP körök csak szórakozásból vannak, és {zero} pontot érnek.',
+    rulesScoringFinish: 'Az idő előtti befejezés az egész játékot lezárja, és az aktuális kör pontszámát rangsorolja – ez {zero}, amíg a kör el nem dől.',
+    rulesDentalText: 'A fogas mód csak a megjelenést változtatja: a piros korongok metszőfogak, a sárgák őrlőfogak, így a két oldalt az alak is megkülönbözteti, nem csak a szín. A szabályok és a pontozás ugyanazok maradnak.',
+    rulesMobileTap: 'Koppints az oszlop bármely pontjára, és a korongod ott esik be.',
+    rulesMobileFs: 'A „Teljes képernyő” gomb eltünteti a böngészősávokat.',
+    touchTap: 'Koppintás egy oszlopra',
+    touchTapAction: 'Korong bedobása',
+    finishedBody: 'A játék véget ért. Új sorozatot bármikor indíthatsz.',
   },
   de: {
     subtitle: 'Wirf Scheiben ein, bilde eine Viererreihe — gegen eine tiefe α-β-Suche oder einen Freund.',
@@ -249,5 +286,23 @@ export const MESSAGES: Messages<MessageKey> = {
     colEmpty: 'Spalte {n}, leer',
     colPartial: 'Spalte {n}, {count} von {rows}: {discs} (von unten)',
     boardLabel: 'Vier-gewinnt-Brett',
+    rulesDiagramLabel: 'Diagramm: vier rote Steine in einer Reihe, in einer Linie und diagonal, jeweils mit einem Haken markiert.',
+    rulesDiagramRow: 'vier in einer Linie',
+    rulesGoal: 'Wirf Steine in die sieben Spalten und bring zuerst vier eigene in eine Linie – waagerecht, senkrecht oder diagonal.',
+    rulesPlayKeys: 'Bewege den Cursor mit den Pfeiltasten (oder A D) oder springe mit 1–7 zu einer Spalte, dann wirfst du mit Enter, Leertaste oder Pfeil nach unten ein – oder klickst einfach auf eine Spalte. P oder Esc pausiert, R startet eine neue Runde, N wechselt den Modus.',
+    rulesPlayTouch: 'Tippe irgendwo in eine Spalte, und dein Stein fällt dort hinein. Tippe zuerst auf Start; mit den Knöpfen unter dem Brett pausierst du, startest eine neue Runde oder beendest das Spiel.',
+    rulesRulesWin: 'Ein Stein fällt auf das unterste freie Loch seiner Spalte. Wer zuerst vier in einer Linie hat, gewinnt; ein volles Brett ohne vier ist ein Unentschieden.',
+    rulesRulesTurn: 'Du spielst Rot gegen die KI (im PvP abwechselnd mit einem Freund). Der Verlierer eröffnet die nächste Runde; nach einem Unentschieden wechselt der Anfang.',
+    rulesRulesSave: 'Deine Serie wird automatisch gespeichert, du kannst also später weitermachen.',
+    rulesScoringIntro: 'Jede Runde gegen die KI wird gewertet. Ein Sieg bringt mehr, je weniger Steine auf dem Brett liegen, ein Unentschieden ein Viertel der Basis, eine Niederlage nichts:',
+    rulesScoringMode: '{mode}: Sieg {min}–{max}, Unentschieden {draw}',
+    rulesScoringPvp: 'PvP-Runden sind nur zum Spaß und zählen {zero} Punkte.',
+    rulesScoringFinish: '„Beenden“ beendet das ganze Spiel und wertet den Punktestand der aktuellen Runde – der ist {zero}, bis die Runde entschieden ist.',
+    rulesDentalText: 'Der Zahnmodus ändert nur das Aussehen: Rote Steine sind Schneidezähne, gelbe Backenzähne – die Seiten unterscheiden sich also durch die Form, nicht nur durch die Farbe. Regeln und Punktewertung bleiben gleich.',
+    rulesMobileTap: 'Tippe irgendwo in eine Spalte, um deinen Stein dort einzuwerfen.',
+    rulesMobileFs: 'Der Knopf „Vollbild“ blendet die Browserleisten aus.',
+    touchTap: 'Spalte antippen',
+    touchTapAction: 'Stein einwerfen',
+    finishedBody: 'Das Spiel ist vorbei. Eine neue Serie kannst du jederzeit starten.',
   },
 };

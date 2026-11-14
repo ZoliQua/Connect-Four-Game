@@ -43,6 +43,8 @@ export type GameState = {
   points: number;
   /** Score of the current round: 0 while playing, set when the round ends. */
   roundScore: number;
+  /** Set by Finish early: the match is over (runtime only, never saved). */
+  finishedEarly?: boolean;
 };
 
 export type GameAction =
@@ -56,6 +58,8 @@ export type GameAction =
   | { type: 'newRound' }
   | { type: 'changeMode'; mode: Mode }
   | { type: 'resetScores' }
-  | { type: 'focus'; col: number };
+  | { type: 'focus'; col: number }
+  /** Finish early: ends the whole match; the current round score is what gets ranked. */
+  | { type: 'finish' };
 
 export type Rng = () => number;
